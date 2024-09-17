@@ -19,7 +19,7 @@ export default {
         bseondary: '#A35A32',
         bternary: '#FFF3EA',
         background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        // foreground: 'hsl(var(--foreground))',
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
@@ -63,7 +63,11 @@ export default {
     themes: {
       light: {
         colors: {
-          primary: '#753F21',
+
+          primary: {
+            foreground: "#ffffff",
+            DEFAULT: '#753F21'
+          },
           secondary: '#A35A32',
           ternary: '#FFF3EA',
         },
