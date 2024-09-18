@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator"
 import { Tabs, Tab } from "@nextui-org/tabs";
 import ProductCard from '@/components/utility/ProductCard';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProductDetails() {
     const [quantity, setQuantity] = useState(1)
     const [isFavorite, setIsFavorite] = useState(false)
+    const navigate = useNavigate()
 
     const product = {
         name: "Chocolate Delight Cupcake",
@@ -53,6 +55,8 @@ export default function ProductDetails() {
     }
 
     const handleAddToCart = () => {
+        navigate('/cart/1')
+
         console.log(`Added ${quantity} ${product.name}(s) to cart`)
         // Implement actual cart functionality here
     }

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Minus, Plus, Trash2 } from "lucide-react"
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Button, Input } from "@nextui-org/react";
+import { useNavigate } from "react-router-dom";
 
 
 // Mock data for cart items
@@ -12,6 +13,7 @@ const initialCartItems = [
 
 export default function CartPage() {
     const [cartItems, setCartItems] = useState(initialCartItems)
+    const navigate = useNavigate()
 
     const updateQuantity = (id, newQuantity) => {
         if (newQuantity >= 0) {
@@ -58,8 +60,9 @@ export default function CartPage() {
                                         <TableCell>
                                             <div className="flex items-center space-x-2">
                                                 <Button
-                                                    variant="outline"
+                                                    variant="flat"
                                                     size="icon"
+                                                    color='primary'
                                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                                 >
                                                     <Minus className="h-4 w-4" />
@@ -72,7 +75,8 @@ export default function CartPage() {
                                                     className="w-16 text-center"
                                                 />
                                                 <Button
-                                                    variant="outline"
+                                                    variant="flat"
+                                                    color='primary'
                                                     size="icon"
                                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                                 >
@@ -111,7 +115,7 @@ export default function CartPage() {
                                     </div>
                                 </div>
                             </div>
-                            <Button variant="shadow" color="primary" className="w-full mt-6">Proceed to Checkout</Button>
+                            <Button onPress={() => navigate('/checkout')} variant="shadow" color="primary" className="w-full mt-6">Proceed to Checkout</Button>
                         </div>
                     </div>
                 </div>

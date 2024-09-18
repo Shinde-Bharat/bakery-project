@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@nextui-org/button"
 import { Input, Radio, RadioGroup } from "@nextui-org/react"
+import { useNavigate } from "react-router-dom"
 
 const savedAddresses = [
     { id: 1, name: "Home", address: "123 Main St, City, Country" },
@@ -14,6 +15,7 @@ const savedAddresses = [
 
 export default function CheckoutPage() {
     const [step, setStep] = useState(1)
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -221,7 +223,7 @@ export default function CheckoutPage() {
                                 <Button type="button" variant="outline" className="mr-2" onClick={() => setStep(1)}>
                                     Back
                                 </Button>
-                                <Button type="submit" color="primary" variant="solid">Pay Now</Button>
+                                <Button onPress={() => navigate('/confirmedOrdered')} type="submit" color="primary" variant="solid">Pay Now</Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>

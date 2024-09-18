@@ -62,7 +62,7 @@ export default function OrderConfirmedPage() {
                     <span>
                       {item.name} x {item.quantity}
                     </span>
-                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -70,19 +70,19 @@ export default function OrderConfirmedPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span>${orderData.subtotal.toFixed(2)}</span>
+                  <span>₹{orderData.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping:</span>
-                  <span>${orderData.shipping.toFixed(2)}</span>
+                  <span>₹{orderData.shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax:</span>
-                  <span>${orderData.tax.toFixed(2)}</span>
+                  <span>₹{orderData.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-semibold">
                   <span>Total:</span>
-                  <span>${orderData.total.toFixed(2)}</span>
+                  <span>₹{orderData.total.toFixed(2)}</span>
                 </div>
               </div>
             </div>

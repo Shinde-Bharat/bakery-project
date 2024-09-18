@@ -2,16 +2,16 @@ import React from 'react';
 // import { ArrowRight } from 'lucide-react';
 
 import { BrowserRouter as Router, Routes, Route, } from "react-router-dom";
-import LadingPage from './pages/Landing/LadingPage';
-import ProductDetails from './pages/ProductDetails/ProductDetails';
-import Layout from './pages/Layout';
-import ExplorePage from './pages/ExplorePage/ExplorePage';
-import CartPage from './pages/CartPage/CartPage';
-import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
-import OrderConfirmedPage from './pages/CheckoutPage/OrderConfirmedPage';
-import TrackOrderPage from './pages/CheckoutPage/TrackOrderPage';
-import FavoritesPage from './pages/FavoritesPage/FavoritesPage';
-import UserProfilePage from './pages/MyAccount/UserProfile';
+import LadingPage from './pages/user/Landing/LadingPage';
+import ProductDetails from './pages/user/ProductDetails/ProductDetails';
+import Layout from './pages/user/Layout';
+import ExplorePage from './pages/user/ExplorePage/ExplorePage';
+import CartPage from './pages/user/CartPage/CartPage';
+import CheckoutPage from './pages/user/CheckoutPage/CheckoutPage';
+import OrderConfirmedPage from './pages/user/CheckoutPage/OrderConfirmedPage';
+import TrackOrderPage from './pages/user/CheckoutPage/TrackOrderPage';
+import FavoritesPage from './pages/user/FavoritesPage/FavoritesPage';
+import UserProfilePage from './pages/user/MyAccount/UserProfile';
 
 // color-amber
 

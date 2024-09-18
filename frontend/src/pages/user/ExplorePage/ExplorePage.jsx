@@ -53,7 +53,6 @@ export default function ExplorePage() {
         <div className=" px-24 py-8 font-Manrope">
 
             <Input
-                label="Search"
                 isClearable
                 placeholder="Search Something..."
                 radius="full"

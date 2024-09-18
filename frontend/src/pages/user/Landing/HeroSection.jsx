@@ -1,5 +1,5 @@
 import React from 'react'
-import hero from '../../assets/hero1.png'
+import hero from '../../../assets/hero1.png'
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { MoveRight } from 'lucide-react';
 import CategorySection from './CategorySection';
@@ -21,7 +21,7 @@ function HeroSection() {
                     <img src={hero} className='h-4/5 drop-shadow-2xl' alt="" />
                 </div>
             </div>
-            <CategorySection />
+
         </div>
     )
 }

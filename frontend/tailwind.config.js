@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const { nextui, colors } = require("@nextui-org/react");
+const { nextui, colors, button } = require("@nextui-org/react");
 
 export default {
   content: [
@@ -65,8 +65,10 @@ export default {
         colors: {
 
           primary: {
+            "700": '#421F0C',
             foreground: "#ffffff",
-            DEFAULT: '#753F21'
+            DEFAULT: '#753F21',
+
           },
           secondary: {
             foreground: '#421F0C',
@@ -74,7 +76,9 @@ export default {
           },
           ternary: '#FFF3EA',
         },
-      }
+
+      },
+
     }
   }),
   require("tailwindcss-animate")
