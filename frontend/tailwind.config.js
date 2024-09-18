@@ -16,7 +16,7 @@ export default {
       colors: {
         bprimaryDark: '#421F0C',
         bprimary: '#753F21',
-        bseondary: '#A35A32',
+        bsecondary: '#A35A32',
         bternary: '#FFF3EA',
         background: 'hsl(var(--background))',
         // foreground: 'hsl(var(--foreground))',
@@ -68,7 +68,10 @@ export default {
             foreground: "#ffffff",
             DEFAULT: '#753F21'
           },
-          secondary: '#A35A32',
+          secondary: {
+            foreground: '#421F0C',
+            DEFAULT: '#A35A32',
+          },
           ternary: '#FFF3EA',
         },
       }

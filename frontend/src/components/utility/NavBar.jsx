@@ -1,9 +1,11 @@
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Input } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Input } from "@nextui-org/react";
 import { Heart, SearchIcon, ShoppingCart } from "lucide-react";
 import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navigate = useNavigate()
     const menuItems = [
         "Profile",
         "Dashboard",
@@ -26,19 +28,19 @@ export default function NavBar() {
 
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
                 <NavbarItem>
-                    <Link color="foreground" href="#">
+                    <NavLink color="foreground" to={'/'}>
                         Home
-                    </Link>
+                    </NavLink>
                 </NavbarItem>
                 <NavbarItem isActive>
-                    <Link href="#" aria-current="page">
-                        Categories
-                    </Link>
+                    <NavLink to={'/explore'} aria-current="page">
+                        Products
+                    </NavLink>
                 </NavbarItem>
                 <NavbarItem>
-                    <Link color="foreground" href="#">
+                    <NavLink color="foreground" href="#">
                         Contact US
-                    </Link>
+                    </NavLink>
                 </NavbarItem>
             </NavbarContent>
             <NavbarContent justify="end">
@@ -48,9 +50,9 @@ export default function NavBar() {
                         isIconOnly
                         radius="full"
                         variant="flat"
-                        onPress={() => { }}
+                        onPress={() => { navigate('/favorites') }}
                     >
-                        <Heart className="text-bseondary" fill="#A35A32" />
+                        <Heart className="text-bsecondary" fill="#A35A32" />
                     </Button>
                 </NavbarItem>
                 <NavbarItem>
@@ -58,13 +60,13 @@ export default function NavBar() {
                         isIconOnly
                         radius="full"
                         variant="flat"
-                        onPress={() => { }}
+                        onPress={() => { navigate('/cart/1') }}
                     >
-                        <ShoppingCart className="text-bseondary" fill="#A35A32" />
+                        <ShoppingCart className="text-bsecondary" fill="#A35A32" />
                     </Button>
                 </NavbarItem>
                 <NavbarItem>
-                    <Button as={Link} color="primary" href="#" variant="flat" radius="full">
+                    <Button color="primary" variant="flat" radius="full">
                         Log in
                     </Button>
                 </NavbarItem>
@@ -72,7 +74,7 @@ export default function NavBar() {
             <NavbarMenu>
                 {menuItems.map((item, index) => (
                     <NavbarMenuItem key={`${item}-${index}`}>
-                        <Link
+                        <NavLink
                             color={
                                 index === 2 ? "primary" : index === menuItems.length - 1 ? "danger" : "foreground"
                             }
@@ -81,7 +83,7 @@ export default function NavBar() {
                             size="lg"
                         >
                             {item}
-                        </Link>
+                        </NavLink>
                     </NavbarMenuItem>
                 ))}
             </NavbarMenu>

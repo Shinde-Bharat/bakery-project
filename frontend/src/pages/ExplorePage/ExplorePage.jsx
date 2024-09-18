@@ -12,13 +12,14 @@ import ProductCard from "@/components/utility/ProductCard";
 // Mock data for demonstration
 const categories = ["Electronics", "Clothing", "Books", "Home & Garden", "Toys"]
 const products = [
-    { id: 1, name: "Smartphone", category: "Electronics", price: 599, rating: 4.5, image: "/placeholder.svg" },
-    { id: 2, name: "T-shirt", category: "Clothing", price: 19.99, rating: 4.0, image: "/placeholder.svg" },
-    { id: 3, name: "Novel", category: "Books", price: 12.99, rating: 4.2, image: "/placeholder.svg" },
-    { id: 4, name: "Coffee Maker", category: "Home & Garden", price: 79.99, rating: 4.7, image: "/placeholder.svg" },
-    { id: 5, name: "Action Figure", category: "Toys", price: 24.99, rating: 3.8, image: "/placeholder.svg" },
-    // Add more mock products as needed
-]
+    { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8 },
+    { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6 },
+    { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7 },
+    { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5 },
+    { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9 },
+    { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3 },
+];
+
 
 export default function ExplorePage() {
     const [searchTerm, setSearchTerm] = useState("")
@@ -146,7 +147,13 @@ export default function ExplorePage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {sortedProducts.map((product) => (
-                            <ProductCard />
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                onAddToCart={() => addToCart(product.id)}
+                                onRemoveFromFavorites={() => removeFromFavorites(product.id)}
+
+                            />
                         ))}
                     </div>
                 </div>

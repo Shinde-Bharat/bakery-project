@@ -22,11 +22,31 @@ export default function ProductDetails() {
         ],
     }
 
-    const relatedProducts = [
-        { name: "Vanilla Dream Cupcake", price: 3.49, image: "https://g-l--q8r-vryke.vusercontent.net/placeholder.svg?height=200&width=200" },
-        { name: "Red Velvet Surprise", price: 3.99, image: "https://g-l--q8r-vryke.vusercontent.net/placeholder.svg?height=200&width=200" },
-        { name: "Lemon Zest Delight", price: 3.79, image: "https://g-l--q8r-vryke.vusercontent.net/placeholder.svg?height=200&width=200" },
-    ]
+    const bakeryData = [
+        { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8 },
+        { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6 },
+        { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7 },
+        { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5 },
+        { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9 },
+        { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3 },
+    ];
+
+    const addToFavorites = (id) => {
+        if (!favorites.includes(id)) {
+            setFavorites([...favorites, id]);
+        }
+    };
+
+    const removeFromFavorites = (id) => {
+        setFavorites(favorites.filter((favId) => favId !== id));
+    };
+
+    const addToCart = (id) => {
+        if (!cart.includes(id)) {
+            setCart([...cart, id]);
+        }
+    };
+
 
     const handleQuantityChange = (amount) => {
         setQuantity(Math.max(1, quantity + amount))
@@ -79,7 +99,7 @@ export default function ProductDetails() {
                             color='primary'
                             onPress={handleToggleFavorite}
                         >
-                            <Heart className="text-bseondary" />
+                            <Heart className="text-bsecondary" />
                         </Button>
                     </div>
                 </div>
@@ -89,7 +109,7 @@ export default function ProductDetails() {
 
             <Tabs aria-label="Options" color='ternary' radius='full'>
 
-                <Tab key="Description" title="Reviews">
+                <Tab key="Description" title="Description">
                     <Card className="rounded-2xl">
                         <CardHeader>
                             <CardTitle>Product Description</CardTitle>
@@ -105,7 +125,7 @@ export default function ProductDetails() {
                         </CardContent>
                     </Card>
                 </Tab>
-                <Tab key="music" title="Music">
+                <Tab key="Reviews" title="Reviews">
                     <Card>
                         <CardHeader>
                             <CardTitle>Customer Reviews</CardTitle>
@@ -139,10 +159,15 @@ export default function ProductDetails() {
             <section>
                 <h2 className="text-2xl font-bold mb-6 text-bprimary">You May Also Like</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
+                    {bakeryData.map((product) => (
+                        <ProductCard
+                            key={product.id}
+                            product={product}
+                            onAddToCart={() => addToCart(product.id)}
+                            onRemoveFromFavorites={() => removeFromFavorites(product.id)}
+
+                        />
+                    ))}
                 </div>
             </section>
         </div>
