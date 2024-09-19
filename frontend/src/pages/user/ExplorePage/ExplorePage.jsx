@@ -1,24 +1,30 @@
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Select, SelectItem } from "@nextui-org/react";
-
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
 import { Slider } from "@nextui-org/react";
-import { Search, StarIcon } from "lucide-react"
+import { Filter, Search, StarIcon } from "lucide-react"
 import { Input } from "@nextui-org/react"
 import ProductCard from "@/components/utility/ProductCard";
 
 // Mock data for demonstration
-const categories = ["Electronics", "Clothing", "Books", "Home & Garden", "Toys"]
+const categories = ["Cakes", "Pastries", "Cupcakes", "Breads"];
+
 const products = [
-    { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8 },
-    { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6 },
-    { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7 },
-    { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5 },
-    { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9 },
-    { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3 },
+    { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8, category: "Cakes" },
+    { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6, category: "Cakes" },
+    { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7, category: "Pastries" },
+    { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5, category: "Pastries" },
+    { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9, category: "Cupcakes" },
+    { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3, category: "Breads" }
 ];
+
 
 
 export default function ExplorePage() {
@@ -93,7 +99,7 @@ export default function ExplorePage() {
                         <h2 className="text-xl font-semibold mb-2">Price Range</h2>
                         <Slider
                             label="Select a budget"
-                            formatOptions={{ style: "currency", currency: "USD" }}
+                            formatOptions={{ style: "currency", currency: "INR" }}
                             step={10}
                             maxValue={1000}
                             minValue={0}
@@ -103,21 +109,24 @@ export default function ExplorePage() {
                         />
 
                         <div className="flex justify-between">
-                            <span>${priceRange[0]}</span>
-                            <span>${priceRange[1]}</span>
+                            <span>₹{priceRange[0]}</span>
+                            <span>₹{priceRange[1]}</span>
                         </div>
                     </div>
 
                     <div>
                         <h2 className="text-xl font-semibold mb-2">Minimum Rating</h2>
-                        <Select selectedKeys={minRating.toString()} onSelectionChange={(value) => setMinRating(Number(value))}>
-
-                            {[0, 1, 2, 3, 4].map((rating) => (
-                                <SelectItem key={rating}>
-                                    {rating} {rating === 1 ? "star" : "stars"} & up
-                                </SelectItem>
-                            ))}
-
+                        <Select value={minRating.toString()} onValueChange={(value) => setMinRating(Number(value))}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select minimum rating" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[0, 1, 2, 3, 4].map((rating) => (
+                                    <SelectItem key={rating} value={rating.toString()}>
+                                        {rating} {rating === 1 ? "star" : "stars"} & up
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
                         </Select>
                     </div>
                 </div>
@@ -126,21 +135,20 @@ export default function ExplorePage() {
                 <div className="md:col-span-3">
                     <div className="flex justify-between items-center mb-4">
                         <p>{sortedProducts.length} products found</p>
-                        <Select
-                            labelPlacement={'outside-left'}
-                            label="Sort by"
-                            className="max-w-xs"
-                            selectedKeys={sortBy}
-                            onSelectionChange={setSortBy}
-                        >
-
-                            <SelectItem key="popularity">Popularity</SelectItem>
-                            <SelectItem key="price-low-high">Price: Low to High</SelectItem>
-                            <SelectItem key="price-high-low">Price: High to Low</SelectItem>
-                            <SelectItem key="rating">Highest Rated</SelectItem>
-
-                        </Select>
-
+                        <div className="flex items-center space-x-2">
+                            <Filter className="text-gray-400" />
+                            <Select value={sortBy} onValueChange={setSortBy}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Sort by" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="popularity">Popularity</SelectItem>
+                                    <SelectItem value="price-low-high">Price: Low to High</SelectItem>
+                                    <SelectItem value="price-high-low">Price: High to Low</SelectItem>
+                                    <SelectItem value="rating">Highest Rated</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
                     </div>
 

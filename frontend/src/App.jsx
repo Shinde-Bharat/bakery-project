@@ -12,6 +12,14 @@ import OrderConfirmedPage from './pages/user/CheckoutPage/OrderConfirmedPage';
 import TrackOrderPage from './pages/user/CheckoutPage/TrackOrderPage';
 import FavoritesPage from './pages/user/FavoritesPage/FavoritesPage';
 import UserProfilePage from './pages/user/MyAccount/UserProfile';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard/AdminDashboard';
+import AdminOverview from './pages/admin/AdminOverview/AdminOverview';
+import OrderMgt from './pages/admin/OrdersMgt/OrdersMgt';
+import ProductMgt from './pages/admin/ProductMgt/ProductMgt';
+import DiscountCouponsMgt from './pages/admin/DiscountCouponsMgt/DiscountCouponsMgt';
+import MessageReviewsMgt from './pages/admin/MessageReviewsMgt/MessageReviewsMgt';
+import UserMgt from './pages/admin/UserMgt/UserMgt';
 
 // color-amber
 
@@ -34,6 +42,15 @@ const App = () => {
             <Route path="/confirmedOrdered" element={<OrderConfirmedPage />} />
             <Route path="/track" element={<TrackOrderPage />} />
           </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminOverview />} />
+            <Route path="/admin/products" element={<ProductMgt />} />
+            <Route path="/admin/orders" element={<OrderMgt />} />
+            <Route path="/admin/users" element={<UserMgt />} />
+            <Route path="/admin/discounts" element={<DiscountCouponsMgt />} />
+            <Route path="/admin/feedback" element={<MessageReviewsMgt />} />
+          </Route>
+
 
         </Routes>
       </Router>
