@@ -7,10 +7,7 @@ import {
     Users,
     Tag,
     MessageSquare,
-    DollarSign,
-    ArrowUpRight,
-    ArrowDownRight,
-    IndianRupee
+
 } from "lucide-react"
 const navItems = [
     { path: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true }, // exact match for /admin
@@ -18,7 +15,7 @@ const navItems = [
     { path: '/admin/orders', label: 'Order Management', icon: ShoppingCart },
     { path: '/admin/users', label: 'User Management', icon: Users },
     { path: '/admin/discounts', label: 'Discounts and Coupons', icon: Tag },
-    { path: '/admin/feedback', label: 'Feedback and Reviews', icon: MessageSquare },
+    { path: '/admin/reviews_messages', label: 'Reviews and Messages', icon: MessageSquare },
 ];
 
 

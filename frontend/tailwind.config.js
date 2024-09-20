@@ -75,6 +75,10 @@ export default {
             DEFAULT: '#A35A32',
           },
           ternary: '#FFF3EA',
+          bblue: {
+            DEFAULT: '#006FEE',
+            foreground: '#fff'
+          }
         },
 
       },

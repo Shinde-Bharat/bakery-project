@@ -4,10 +4,13 @@ import { Image, Tooltip } from "@nextui-org/react";
 import { button } from "@nextui-org/theme";
 import { Star, Heart, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import cake from '../../assets/categories/cake.jpg'
+import { useWishlist } from "@/hooks/reduxHooks";
 // Accepting product details and action handlers as props
 export default function ProductCard({ product, onAddToCart, onRemoveFromFavorites, inCart }) {
     const navigate = useNavigate();
+    const { addToWishlist, wishlist } = useWishlist()
+    const isInWishlist = wishlist.some(item => item.id === product.id);
 
     return (
 
@@ -21,7 +24,8 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
                     isZoomed
 
                     className="object-cover rounded-xl cursor-pointer aspect-square"
-                    src={"https://nextui.org/images/fruit-2.jpeg"}
+                    src={cake}
+                    // src={"https://nextui.org/images/fruit-2.jpeg"}
                     width={240}
                 />
             </CardBody>
@@ -51,11 +55,13 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
                             radius="full"
                             variant="light"
                             onPress={(e) => {
-                                e.stopPropagation(); // Prevent click from bubbling to the card
+                                addToWishlist(product)
                                 onRemoveFromFavorites();
                             }}
                         >
-                            <Heart className="text-bsecondary" />
+                            {isInWishlist ? (
+
+                                <Heart className="text-bsecondary" fill="#A35A32" />) : <Heart className="text-bsecondary" />}
                         </Button>
                         <Button
                             isIconOnly
@@ -64,7 +70,6 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
                             variant="light"
                             disabled={inCart} // Disable button if in cart
                             onPress={(e) => {
-                                e.stopPropagation(); // Prevent click from bubbling to the card
                                 onAddToCart();
                             }}
                         >

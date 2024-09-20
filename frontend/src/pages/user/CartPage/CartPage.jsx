@@ -11,7 +11,20 @@ const initialCartItems = [
     { id: 3, name: "Portable Charger", price: 49.99, quantity: 2, image: "https://g-l--q8r-vryke.vusercontent.net/placeholder.svg" },
 ]
 
+const ongoingOffer = {
+    type: "percentage",
+    value: 10,
+    description: "10% off on all items"
+}
+
+const validCoupons = [
+    { code: "SAVE20", type: "percentage", value: 20 },
+    { code: "FLAT10OFF", type: "flat", value: 10 },
+]
+
 export default function CartPage() {
+    const [couponCode, setCouponCode] = useState("")
+    const [appliedCoupon, setAppliedCoupon] = useState(null)
     const [cartItems, setCartItems] = useState(initialCartItems)
     const navigate = useNavigate()
 
@@ -31,7 +44,30 @@ export default function CartPage() {
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const tax = subtotal * 0.1 // Assuming 10% tax
-    const total = subtotal + tax
+
+    // Apply ongoing offer
+    const ongoingOfferDiscount = ongoingOffer.type === "percentage"
+        ? subtotal * (ongoingOffer.value / 100)
+        : ongoingOffer.value
+
+    // Apply coupon discount
+    const applyCoupon = () => {
+        const coupon = validCoupons.find(c => c.code === couponCode)
+        if (coupon) {
+            setAppliedCoupon(coupon)
+            setCouponCode("")
+        } else {
+            alert("Invalid coupon code")
+        }
+    }
+
+    const couponDiscount = appliedCoupon
+        ? appliedCoupon.type === "percentage"
+            ? subtotal * (appliedCoupon.value / 100)
+            : appliedCoupon.value
+        : 0
+
+    const total = subtotal + tax - ongoingOfferDiscount - couponDiscount
 
     return (
         <div className="px-24 py-8 font-Montserrat">
@@ -108,6 +144,18 @@ export default function CartPage() {
                                     <span>Tax</span>
                                     <span>${tax.toFixed(2)}</span>
                                 </div>
+                                {ongoingOfferDiscount > 0 && (
+                                    <div className="flex justify-between text-green-600">
+                                        <span>Ongoing Offer ({ongoingOffer.description})</span>
+                                        <span>-${ongoingOfferDiscount.toFixed(2)}</span>
+                                    </div>
+                                )}
+                                {appliedCoupon && (
+                                    <div className="flex justify-between text-green-600">
+                                        <span>Coupon Discount ({appliedCoupon.code})</span>
+                                        <span>-${couponDiscount.toFixed(2)}</span>
+                                    </div>
+                                )}
                                 <div className="border-t pt-2 mt-2">
                                     <div className="flex justify-between font-semibold">
                                         <span>Total</span>
@@ -115,7 +163,20 @@ export default function CartPage() {
                                     </div>
                                 </div>
                             </div>
-                            <Button onPress={() => navigate('/checkout')} variant="shadow" color="primary" className="w-full mt-6">Proceed to Checkout</Button>
+                            <div className="mt-4">
+                                <Input
+                                    placeholder="Enter coupon code"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value)}
+                                    className="mb-2"
+                                />
+                                <Button onClick={applyCoupon} variant="flat" color="secondary" className="w-full">
+                                    Apply Coupon
+                                </Button>
+                            </div>
+                            <Button onPress={() => navigate('/checkout')} variant="shadow" color="primary" className="w-full mt-6">
+                                Proceed to Checkout
+                            </Button>
                         </div>
                     </div>
                 </div>

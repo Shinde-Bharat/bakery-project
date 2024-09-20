@@ -1,10 +1,14 @@
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Input } from "@nextui-org/react";
+import { useWishlist } from "@/hooks/reduxHooks";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Input, Badge } from "@nextui-org/react";
 import { Heart, SearchIcon, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { wishlist } = useWishlist()
+    console.log(wishlist);
+
     const navigate = useNavigate()
     const menuItems = [
         "Profile",
@@ -22,7 +26,7 @@ export default function NavBar() {
                     className="sm:hidden"
                 />
                 <NavbarBrand>
-                    <p className="font-bold text-inherit">Bakery</p>
+                    <p className="font-bold text-inherit">Bakery </p>
                 </NavbarBrand>
             </NavbarContent>
 
@@ -46,14 +50,17 @@ export default function NavBar() {
             <NavbarContent justify="end">
 
                 <NavbarItem>
-                    <Button
-                        isIconOnly
-                        radius="full"
-                        variant="flat"
-                        onPress={() => { navigate('/favorites') }}
-                    >
-                        <Heart className="text-bsecondary" fill="#A35A32" />
-                    </Button>
+                    <Badge content={wishlist.length} size="lg" className="bg-blue-500 text-white">
+                        <Button
+                            isIconOnly
+                            radius="full"
+                            variant="flat"
+                            onPress={() => { navigate('/favorites') }}
+                        >
+                            <Heart className="text-bsecondary" fill="#A35A32" />
+
+                        </Button>
+                    </Badge>
                 </NavbarItem>
                 <NavbarItem>
                     <Button

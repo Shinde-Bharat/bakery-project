@@ -14,7 +14,7 @@ function SideNav({ navItems }) {
                     <NavLink to={path} key={path} end={exact} className="w-full">
                         {({ isActive }) => (
                             <div
-                                className={`w-full justify-start mt-2 hover:bg-bternary  flex items-center py-2 px-2 text-nowrap hover:shadow-none rounded-lg font-medium ${isActive ? "bg-bprimary text-white shadow-lg shadow-bsecondary hover:bg-bprimary hover:text-white hover:shadow-lg hover:shadow-bsecondary" : "hover:text-bprimary"}`}
+                                className={`w-full justify-start mt-2  flex items-center py-2 px-2 text-nowrap hover:shadow-none rounded-lg font-medium ${isActive ? "bg-bprimary text-white shadow-lg shadow-bsecondary/30 hover:bg-bprimary hover:text-white hover:shadow-lg hover:shadow-bsecondary/30" : "hover:text-bprimary hover:bg-bternary "}`}
                             >
                                 <Icon className="mr-2 h-5 w-5" />
                                 <p className='text-sm'>{label}</p>
