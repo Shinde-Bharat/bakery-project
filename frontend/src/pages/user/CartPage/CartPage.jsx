@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Minus, Plus, Trash2 } from "lucide-react"
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Button, Input } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/hooks/reduxHooks";
 
 
 // Mock data for cart items
@@ -26,6 +27,9 @@ export default function CartPage() {
     const [couponCode, setCouponCode] = useState("")
     const [appliedCoupon, setAppliedCoupon] = useState(null)
     const [cartItems, setCartItems] = useState(initialCartItems)
+    const { cart, removeItem, updateItemQuantity } = useCart()
+    console.log(cart);
+
     const navigate = useNavigate()
 
     const updateQuantity = (id, newQuantity) => {
@@ -38,9 +42,7 @@ export default function CartPage() {
         }
     }
 
-    const removeItem = (id) => {
-        setCartItems(cartItems.filter((item) => item.id !== id))
-    }
+
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const tax = subtotal * 0.1 // Assuming 10% tax
@@ -71,8 +73,8 @@ export default function CartPage() {
 
     return (
         <div className="px-24 py-8 font-Montserrat">
-            <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
-            {cartItems.length === 0 ? (
+            <h1 className="text-3xl font-bold mb-8">Your Cart {cart.items.length}</h1>
+            {cart.items.length === 0 ? (
                 <p className="text-xl text-center">Your cart is empty.</p>
             ) : (
                 <div className="grid gap-8 md:grid-cols-3">
@@ -87,7 +89,7 @@ export default function CartPage() {
                                 <TableColumn className="text-right uppercase">Action</TableColumn>
                             </TableHeader>
                             <TableBody>
-                                {cartItems.map((item) => (
+                                {cart.items.map((item) => (
                                     <TableRow key={item.id}>
                                         <TableCell>
                                             <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
@@ -99,7 +101,7 @@ export default function CartPage() {
                                                     variant="flat"
                                                     size="icon"
                                                     color='primary'
-                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                    onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
                                                 >
                                                     <Minus className="h-4 w-4" />
                                                 </Button>
@@ -107,14 +109,14 @@ export default function CartPage() {
                                                     type="number"
                                                     min="0"
                                                     value={item.quantity}
-                                                    onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                                                    onChange={(e) => updateItemQuantity(item.id, parseInt(e.target.value))}
                                                     className="w-16 text-center"
                                                 />
                                                 <Button
                                                     variant="flat"
                                                     color='primary'
                                                     size="icon"
-                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
                                                 >
                                                     <Plus className="h-4 w-4" />
                                                 </Button>

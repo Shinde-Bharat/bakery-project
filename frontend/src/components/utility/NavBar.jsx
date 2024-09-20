@@ -1,4 +1,4 @@
-import { useWishlist } from "@/hooks/reduxHooks";
+import { useCart, useWishlist } from "@/hooks/reduxHooks";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Input, Badge } from "@nextui-org/react";
 import { Heart, SearchIcon, ShoppingCart } from "lucide-react";
 import { useState } from "react";
@@ -7,9 +7,16 @@ import { NavLink, useNavigate } from "react-router-dom";
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { wishlist } = useWishlist()
-    console.log(wishlist);
+    const { cart } = useCart()
 
     const navigate = useNavigate()
+    const navItems = [
+        { name: "Home", path: "/" },
+        { name: "Products", path: "/explore" },
+        { name: "About Us", path: "/about" },
+        { name: "Contact Us", path: "/contact" }
+    ];
+
     const menuItems = [
         "Profile",
         "Dashboard",
@@ -31,21 +38,20 @@ export default function NavBar() {
             </NavbarContent>
 
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
-                <NavbarItem>
-                    <NavLink color="foreground" to={'/'}>
-                        Home
-                    </NavLink>
-                </NavbarItem>
-                <NavbarItem isActive>
-                    <NavLink to={'/explore'} aria-current="page">
-                        Products
-                    </NavLink>
-                </NavbarItem>
-                <NavbarItem>
-                    <NavLink color="foreground" href="#">
-                        Contact US
-                    </NavLink>
-                </NavbarItem>
+                {navItems.map((item) => (
+                    <NavbarItem key={item.name}>
+                        <NavLink
+                            to={item.path}
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "text-primary font-bold" // Active class styles
+                                    : "text-foreground"        // Default class styles
+                            }
+                        >
+                            {item.name}
+                        </NavLink>
+                    </NavbarItem>
+                ))}
             </NavbarContent>
             <NavbarContent justify="end">
 
@@ -58,19 +64,20 @@ export default function NavBar() {
                             onPress={() => { navigate('/favorites') }}
                         >
                             <Heart className="text-bsecondary" fill="#A35A32" />
-
                         </Button>
                     </Badge>
                 </NavbarItem>
                 <NavbarItem>
-                    <Button
-                        isIconOnly
-                        radius="full"
-                        variant="flat"
-                        onPress={() => { navigate('/cart/1') }}
-                    >
-                        <ShoppingCart className="text-bsecondary" fill="#A35A32" />
-                    </Button>
+                    <Badge content={cart.items.length} size="lg" className="bg-blue-500 text-white">
+                        <Button
+                            isIconOnly
+                            radius="full"
+                            variant="flat"
+                            onPress={() => { navigate('/cart') }}
+                        >
+                            <ShoppingCart className="text-bsecondary" fill="#A35A32" />
+                        </Button>
+                    </Badge>
                 </NavbarItem>
                 <NavbarItem>
                     <Button color="primary" variant="flat" radius="full">

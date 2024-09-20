@@ -36,12 +36,12 @@ function CategorySection() {
     ];
 
     const bakeryData = [
-        { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8, category: "Cakes" },
-        { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6, category: "Cakes" },
-        { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7, category: "Pastries" },
-        { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5, category: "Pastries" },
+        { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8, category: "Cakes", avlQuantity: 3 },
+        { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6, category: "Cakes", avlQuantity: 3 },
+        { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7, category: "Pastries", avlQuantity: 3 },
+        { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5, category: "Pastries", avlQuantity: 3 },
         { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9, category: "Cupcakes" },
-        { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3, category: "Breads" },
+        { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3, category: "Breads", avlQuantity: 3 },
     ];
 
     const [selectedCategory, setSelectedCategory] = useState("Cakes");

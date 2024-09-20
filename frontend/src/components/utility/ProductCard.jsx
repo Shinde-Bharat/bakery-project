@@ -1,28 +1,31 @@
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
-import { Image, Tooltip } from "@nextui-org/react";
+import { Chip, Image, Tooltip } from "@nextui-org/react";
 import { button } from "@nextui-org/theme";
 import { Star, Heart, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import cake from '../../assets/categories/cake.jpg'
-import { useWishlist } from "@/hooks/reduxHooks";
+import { useCart, useWishlist } from "@/hooks/reduxHooks";
 // Accepting product details and action handlers as props
 export default function ProductCard({ product, onAddToCart, onRemoveFromFavorites, inCart }) {
     const navigate = useNavigate();
-    const { addToWishlist, wishlist } = useWishlist()
+    const { addToWishlist, wishlist, removeFromWishlist } = useWishlist()
+    const { cart, addItem, removeItem } = useCart()
     const isInWishlist = wishlist.some(item => item.id === product.id);
+    const isInCart = cart.items.some(item => item.id === product.id);
 
     return (
 
         <Card className="w-fit mt-6 font-Montserrat" isBlurred>
-            <CardBody className="overflow-visible">
-
+            <CardBody className="overflow-visible relative">
+                <div className="absolute z-20 top-5 left-5">
+                    <Chip color="primary" size="sm" variant="shadow">{product.category}</Chip>
+                </div>
                 <Image
                     alt={product.name}
                     isBlurred
                     onClick={() => { navigate('/product') }}
                     isZoomed
-
                     className="object-cover rounded-xl cursor-pointer aspect-square"
                     src={cake}
                     // src={"https://nextui.org/images/fruit-2.jpeg"}
@@ -55,25 +58,33 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
                             radius="full"
                             variant="light"
                             onPress={(e) => {
-                                addToWishlist(product)
-                                onRemoveFromFavorites();
+                                // onRemoveFromFavorites();
+                                if (isInWishlist) {
+                                    removeFromWishlist(product.id); // Function to remove item from cart
+                                } else {
+                                    addToWishlist(product); // Function to add item to cart
+                                }
                             }}
                         >
                             {isInWishlist ? (
-
-                                <Heart className="text-bsecondary" fill="#A35A32" />) : <Heart className="text-bsecondary" />}
+                                <Heart className="text-bsecondary" fill="#A35A32" />) : <Heart className="text-bsecondary" />
+                            }
                         </Button>
                         <Button
                             isIconOnly
                             className="text-default-900/60 data-[hover]:bg-foreground/10 -translate-y-2 translate-x-2"
                             radius="full"
                             variant="light"
-                            disabled={inCart} // Disable button if in cart
+                            // disabled={inCart} // Disable button if in cart
                             onPress={(e) => {
-                                onAddToCart();
+                                if (isInCart) {
+                                    removeItem(product.id); // Function to remove item from cart
+                                } else {
+                                    addItem(product); // Function to add item to cart
+                                }
                             }}
                         >
-                            {inCart ? <ShoppingCart className="text-bsecondary" fill="#A35A32" /> : <ShoppingCart className="text-bsecondary" />}
+                            {isInCart ? <ShoppingCart className="text-bsecondary" fill="#A35A32" /> : <ShoppingCart className="text-bsecondary" />}
                         </Button>
                     </div>
                 </div>

@@ -6,11 +6,16 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, Tab } from "@nextui-org/tabs";
 import ProductCard from '@/components/utility/ProductCard';
 import { useNavigate } from 'react-router-dom';
+import { useCart, useWishlist } from '@/hooks/reduxHooks';
 
 export default function ProductDetails() {
     const [quantity, setQuantity] = useState(1)
     const [isFavorite, setIsFavorite] = useState(false)
     const navigate = useNavigate()
+    const { addToWishlist, wishlist, removeFromWishlist } = useWishlist()
+    const { cart, addItem, removeItem } = useCart()
+
+
 
     const product = {
         name: "Chocolate Delight Cupcake",
@@ -32,6 +37,10 @@ export default function ProductDetails() {
         { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9 },
         { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3 },
     ];
+
+    const isInWishlist = wishlist.some(item => item.id === product.id);
+    const isInCart = cart.items.some(item => item.id === product.id);
+
 
     const addToFavorites = (id) => {
         if (!favorites.includes(id)) {
@@ -55,7 +64,7 @@ export default function ProductDetails() {
     }
 
     const handleAddToCart = () => {
-        navigate('/cart/1')
+        navigate('/cart')
 
         console.log(`Added ${quantity} ${product.name}(s) to cart`)
         // Implement actual cart functionality here
@@ -75,6 +84,7 @@ export default function ProductDetails() {
                 </div>
                 <div>
                     <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+                    <h1 className="text-lg text-slate-800 font-semibold mb-2">{product.category}</h1>
                     <div className="flex items-center mb-4">
                         {Array(5).fill(0).map((_, i) => (
                             <Star key={i} className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
@@ -93,17 +103,33 @@ export default function ProductDetails() {
                         </Button>
                     </div>
                     <div className="flex space-x-4">
-                        <Button radius='full' className='flex-1 text-white px-4' variant="shadow" color='primary' onClick={handleAddToCart}>
-                            <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+                        <Button radius='full' className='flex-1 text-white px-4' variant="shadow" color='primary'
+                            onPress={(e) => {
+                                if (isInCart) {
+                                    removeItem(product.id); // Function to remove item from cart
+                                } else {
+                                    addItem(product); // Function to add item to cart
+                                }
+                            }}>
+                            <ShoppingCart className="mr-2 h-4 w-4" /> {isInCart ? "Already added " : "Add "} to Cart
                         </Button>
                         <Button
                             isIconOnly
                             radius="full"
                             variant="flat"
                             color='primary'
-                            onPress={handleToggleFavorite}
+                            onPress={(e) => {
+                                // onRemoveFromFavorites();
+                                if (isInWishlist) {
+                                    removeFromWishlist(product.id); // Function to remove item from cart
+                                } else {
+                                    addToWishlist(product); // Function to add item to cart
+                                }
+                            }}
                         >
-                            <Heart className="text-bsecondary" />
+                            {isInWishlist ? (
+                                <Heart className="text-bsecondary" fill="#A35A32" />) : <Heart className="text-bsecondary" />
+                            }
                         </Button>
                     </div>
                 </div>
