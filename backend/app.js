@@ -7,6 +7,7 @@ const couponRoutes = require('./routes/couponRoutes');
 const offerRoutes = require('./routes/offerRoutes');
 const userRoutes = require('./routes/userRoutes');
 const orderRoutes = require('./routes/orderRoutes')
+const deliveryBoyRoutes = require('./routes/deliveryBoyRoutes')
 
 require('dotenv').config();
 const cors = require('cors');
