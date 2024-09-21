@@ -16,10 +16,10 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
 
     return (
 
-        <Card className="w-fit mt-6 font-Montserrat" isBlurred>
+        <Card className="w-fit mt-6 font-Montserrat hover:scale-105 hover:transition-all hover:ease-in" isBlurred>
             <CardBody className="overflow-visible relative">
                 <div className="absolute z-20 top-5 left-5">
-                    <Chip color="primary" size="sm" variant="shadow">{product.category}</Chip>
+                    <Chip color="primary" size="sm" variant="shadow">{product.category.name}</Chip>
                 </div>
                 <Image
                     alt={product.name}

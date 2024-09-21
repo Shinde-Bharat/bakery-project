@@ -1,50 +1,66 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CategoryCard from './CategoryCard';
 import ProductCard from '../../../components/utility/ProductCard';
 import SectionHeading from '../../../components/utility/SectionHeading';
 import bun from '../../../assets/categories/bun.png';
+import bagutte from '../../../assets/categories/bagutte.png';
 import croinssant from '../../../assets/categories/croinssant.png';
+import cupcake from '../../../assets/categories/cupcake.png';
+import donut from '../../../assets/categories/donut.png';
 
 function CategorySection() {
+
+    const [bakeryData, setbakeryData] = useState([])
+    useEffect(() => {
+        // Function to fetch data
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/api/products/');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const result = await response.json();
+                setbakeryData(result); // Set the fetched data
+            } catch (error) {
+                console.log(error);
+
+            }
+        };
+
+        fetchData(); // Invoke the fetch function when the component mounts
+    }, []);
+    console.log(bakeryData[0]);
 
     const categories = [
         {
             id: 1,
-            categoryName: "Cakes",
-            image: bun, // Replace with actual image URL
+            categoryName: "Cake",
+            image: cupcake, // Replace with actual image URL
         },
         {
             id: 2,
-            categoryName: "Pastries",
+            categoryName: "Croinssant",
             image: croinssant, // Replace with actual image URL
         },
         {
             id: 3,
-            categoryName: "Breads",
+            categoryName: "Bun",
             image: bun, // Replace with actual image URL
         },
         {
             id: 4,
-            categoryName: "Cookies",
-            image: croinssant, // Replace with actual image URL
+            categoryName: "Bagutte",
+            image: bagutte, // Replace with actual image URL
         },
         {
             id: 5,
-            categoryName: "Cupcakes",
-            image: bun, // Replace with actual image URL
+            categoryName: "Donut",
+            image: donut, // Replace with actual image URL
         }
     ];
 
-    const bakeryData = [
-        { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8, category: "Cakes", avlQuantity: 3 },
-        { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6, category: "Cakes", avlQuantity: 3 },
-        { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7, category: "Pastries", avlQuantity: 3 },
-        { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5, category: "Pastries", avlQuantity: 3 },
-        { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9, category: "Cupcakes" },
-        { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3, category: "Breads", avlQuantity: 3 },
-    ];
 
-    const [selectedCategory, setSelectedCategory] = useState("Cakes");
+    const [selectedCategory, setSelectedCategory] = useState("Cake");
 
     // Function to handle category selection
     const handleCategoryClick = (categoryName) => {
@@ -52,9 +68,12 @@ function CategorySection() {
     };
 
     // Filter the products based on the selected category
-    const filteredProducts = selectedCategory
-        ? bakeryData.filter((product) => product.category === selectedCategory)
+    const filteredProducts = selectedCategory && bakeryData
+        ?
+        bakeryData.filter((product) => product.category?.name === selectedCategory)
         : bakeryData; // Show all products if no category is selected
+
+
 
     const addToCart = (id) => {
         console.log("Added to cart:", id);
@@ -69,7 +88,7 @@ function CategorySection() {
             <SectionHeading heading={"Category"} />
 
             <div className="flex justify-around">
-                <div className="flex justify-around gap-4">
+                <div className="flex justify-around gap-8">
                     {categories.map((category) => (
                         <CategoryCard
                             key={category.id}
