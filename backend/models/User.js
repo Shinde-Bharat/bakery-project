@@ -32,7 +32,12 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, enum: ['user', 'admin', 'delivery'], default: 'user' },
     savedAddresses: [addressSchema],
-    orderHistory: [orderHistorySchema]
+    orderHistory: [orderHistorySchema],
+    wishlistItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    cartItems: [{
+        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        quantity: { type: Number, default: 1 }
+    }]
 });
 
 module.exports = mongoose.model('User', userSchema);

@@ -4,9 +4,9 @@ const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
     try {
-        const { name, email, phoneNumber, password } = req.body;
+        const { name, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ name, email, phoneNumber, password: hashedPassword });
+        const user = new User({ name, email, password: hashedPassword });
         await user.save();
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.status(201).json({ message: 'User registered successfully', token });
@@ -40,8 +40,16 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
     try {
-        const { name, phoneNumber } = req.body;
-        const user = await User.findByIdAndUpdate(req.user.userId, { name, phoneNumber }, { new: true }).select('-password');
+        const updateData = req.body;
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            updateData,
+            { new: true }
+        )
+            .select('-password')
+            .populate('wishlistItems')
+            .populate('cartItems.product');
+
         res.json(user);
     } catch (error) {
         res.status(400).json({ message: error.message });
