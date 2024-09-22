@@ -24,7 +24,7 @@ import DeliveryDashboard from './pages/delivery/DeliveryDashboard/DeliveryDashbo
 import DeliveryProfile from './pages/delivery/DeliveryProfile/DeliveryProfile';
 import MyOrders from './pages/delivery/MyOrders/MyOrders';
 import PrivacyPolicy from './pages/user/privacy_policy/PrivacyPolicy';
-import LoginRegister from './pages/user/LoginRegister/LoginRegister';
+import Login from './pages/user/LoginRegister/Login';
 
 // color-amber
 
@@ -48,7 +48,7 @@ const App = () => {
             <Route path="/track" element={<TrackOrderPage />} />
 
           </Route>
-          <Route path="/login" element={<LoginRegister />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/privacy_policy" element={<PrivacyPolicy />} />
 
           <Route path="/admin" element={<AdminLayout />}>

@@ -1,13 +1,45 @@
-import { useCart, useWishlist } from "@/hooks/reduxHooks";
+import { useCart, useUser, useWishlist } from "@/hooks/reduxHooks";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Input, Badge } from "@nextui-org/react";
 import { Heart, SearchIcon, ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+
 
 export default function NavBar() {
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { wishlist } = useWishlist()
     const { cart } = useCart()
+    const { user } = useUser()
+
+
+
+    // useEffect(() => {
+
+    //     const user = JSON.parse(localStorage.getItem('user'));
+    //     if (user?.token) {
+    //         const fetchUserData = async () => {
+    //             // Fetch the full user profile
+    //             const userProfile = await getUserProfile();
+
+    //             //making new object for the redux
+    //             const userInfo = {
+    //                 id: userProfile?._id,
+    //                 name: userProfile?.name,
+    //                 email: userProfile?.email,
+    //                 isLoggedIn: true,
+    //             };
+
+
+    //             // Update Redux store with the full user profile
+    //             updateUserInfo(userInfo);
+    //         }
+    //         fetchUserData()
+
+    //     }
+    // }, [])
+
 
     const navigate = useNavigate()
     const navItems = [
@@ -80,9 +112,20 @@ export default function NavBar() {
                     </Badge>
                 </NavbarItem>
                 <NavbarItem>
-                    <Button color="primary" variant="flat" radius="full">
-                        Log in
-                    </Button>
+                    {
+                        user.isLoggedIn ?
+                            <Button isIconOnly color="primary" variant="flat" radius="full" onPress={() => navigate('/profile')}>
+                                <Avatar>
+                                    <AvatarImage src={user?.avatar} alt={user?.name} />
+                                    <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                            </Button>
+                            :
+                            <Button color="primary" variant="flat" radius="full" onPress={() => navigate('/login')}>
+                                Log in
+                            </Button>
+                    }
+
                 </NavbarItem>
             </NavbarContent>
             <NavbarMenu>

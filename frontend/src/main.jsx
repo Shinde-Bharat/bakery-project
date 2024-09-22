@@ -4,17 +4,21 @@ import { Provider } from 'react-redux';
 import App from './App.jsx'
 import './index.css'
 import { NextUIProvider } from '@nextui-org/react'
-import store from './redux/store.js';
+import { store, persistor } from './redux/store';
 import { Toaster } from "@/components/ui/toaster"
+import { PersistGate } from 'redux-persist/integration/react';
+
 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-      <NextUIProvider>
-        <App />
-        <Toaster />
-      </NextUIProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <NextUIProvider>
+          <App />
+          <Toaster />
+        </NextUIProvider>
+      </PersistGate>
     </Provider>
   </StrictMode>,
 )

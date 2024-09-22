@@ -1,4 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { updateUserProfile } from '@/services/apis/user';
+
+export const syncWishlistWithDatabase = createAsyncThunk(
+    'wishlist/syncWithDatabase',
+    async (_, { getState }) => {
+        const { wishlist } = getState();
+        await updateUserProfile({ wishlistItems: wishlist });
+        return wishlist;
+    }
+);
 
 const wishlistSlice = createSlice({
     name: 'wishlist',
@@ -18,6 +28,11 @@ const wishlistSlice = createSlice({
         moveToCart: (state, action) => {
             return state.filter(item => item.id !== action.payload.id);
         }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(syncWishlistWithDatabase.fulfilled, (state, action) => {
+            // Update state if necessary after syncing with database
+        });
     }
 });
 

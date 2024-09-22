@@ -1,19 +1,38 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { addItem, removeItem, updateItemQuantity, clearCart, moveFromWishlist } from '@/redux/slices/cartSlice';
-import { addToWishlist, removeFromWishlist, clearWishlist, moveToCart } from '@/redux/slices/wishlistSlice';
-import { login, logout, updateUserInfo } from '@/redux/slices/userSlice';
+import { addItem, removeItem, updateItemQuantity, clearCart, moveFromWishlist, syncCartWithDatabase } from '@/redux/slices/cartSlice';
+import { addToWishlist, removeFromWishlist, clearWishlist, moveToCart, syncWishlistWithDatabase } from '@/redux/slices/wishlistSlice';
+import { login, logout, fetchUserProfile, updateProfile } from '@/redux/slices/userSlice';
 
 export const useCart = () => {
     const cart = useSelector(state => state.cart);
     const dispatch = useDispatch();
 
+    const syncCart = async () => {
+        await dispatch(syncCartWithDatabase());
+    };
+
     return {
         cart,
-        addItem: (item) => dispatch(addItem(item)),
-        removeItem: (id) => dispatch(removeItem(id)),
-        updateItemQuantity: (id, quantity) => dispatch(updateItemQuantity({ id, quantity })),
-        clearCart: () => dispatch(clearCart()),
-        moveFromWishlist: (item) => dispatch(moveFromWishlist(item))
+        addItem: (item) => {
+            dispatch(addItem(item));
+            syncCart();
+        },
+        removeItem: (id) => {
+            dispatch(removeItem(id));
+            syncCart();
+        },
+        updateItemQuantity: (id, quantity) => {
+            dispatch(updateItemQuantity({ id, quantity }));
+            syncCart();
+        },
+        clearCart: () => {
+            dispatch(clearCart());
+            syncCart();
+        },
+        moveFromWishlist: (item) => {
+            dispatch(moveFromWishlist(item));
+            syncCart();
+        }
     };
 };
 
@@ -21,12 +40,28 @@ export const useWishlist = () => {
     const wishlist = useSelector(state => state.wishlist);
     const dispatch = useDispatch();
 
+    const syncWishlist = async () => {
+        await dispatch(syncWishlistWithDatabase());
+    };
+
     return {
         wishlist,
-        addToWishlist: (item) => dispatch(addToWishlist(item)),
-        removeFromWishlist: (id) => dispatch(removeFromWishlist(id)),
-        clearWishlist: () => dispatch(clearWishlist()),
-        moveToCart: (item) => dispatch(moveToCart(item))
+        addToWishlist: (item) => {
+            dispatch(addToWishlist(item));
+            syncWishlist();
+        },
+        removeFromWishlist: (id) => {
+            dispatch(removeFromWishlist(id));
+            syncWishlist();
+        },
+        clearWishlist: () => {
+            dispatch(clearWishlist());
+            syncWishlist();
+        },
+        moveToCart: (item) => {
+            dispatch(moveToCart(item));
+            syncWishlist();
+        }
     };
 };
 
@@ -38,6 +73,7 @@ export const useUser = () => {
         user,
         login: (userData) => dispatch(login(userData)),
         logout: () => dispatch(logout()),
-        updateUserInfo: (userData) => dispatch(updateUserInfo(userData))
+        fetchProfile: () => dispatch(fetchUserProfile()),
+        updateProfile: (profileData) => dispatch(updateProfile(profileData))
     };
 };

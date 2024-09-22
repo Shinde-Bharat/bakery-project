@@ -1,5 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { updateUserProfile } from '@/services/apis/user';
 
+export const syncCartWithDatabase = createAsyncThunk(
+    'cart/syncWithDatabase',
+    async (_, { getState }) => {
+        const { cart } = getState();
+        await updateUserProfile({ cartItems: cart.items });
+        return cart.items;
+    }
+);
 const cartSlice = createSlice({
     name: 'cart',
     initialState: {
@@ -44,6 +53,10 @@ const cartSlice = createSlice({
             }
             state.total = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
         }
+    }, extraReducers: (builder) => {
+        builder.addCase(syncCartWithDatabase.fulfilled, (state, action) => {
+            // Update state if necessary after syncing with database
+        });
     }
 });
 

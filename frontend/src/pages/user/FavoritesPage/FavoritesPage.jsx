@@ -33,7 +33,7 @@ export default function FavoritesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {wishlist.map((product) => (
             <ProductCard
-              key={product.id}
+              key={product._id}
               product={product}
 
             />

@@ -27,7 +27,7 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false)
     const [selected, setSelected] = useState("login");
     const navigate = useNavigate();
-    const { updateUserInfo } = useUser()
+    const { login, user } = useUser()
 
     // Setup forms with react-hook-form and zodResolver for validation
     const loginForm = useForm({
@@ -51,9 +51,32 @@ export default function Login() {
     const onLoginSubmit = async (values) => {
         try {
             const response = await loginUser(values);
-            localStorage.setItem('user', JSON.stringify(response.user));
-            localStorage.setItem('token', response.token);
-            if (response?.status === 201) {
+            console.log(response);
+
+            localStorage.setItem('user', JSON.stringify({
+                token: response.token, // Assuming the API returns the token
+                refreshToken: response?.refreshToken // If refreshToken is returned
+            }));
+            // Fetch the full user profile
+            const userProfile = await getUserProfile();
+
+            console.log("user data", userProfile);
+
+            const userInfo = {
+                name: userProfile?.name,
+                email: userProfile?.email,
+                phoneNumber: userProfile?.phoneNumber,
+                savedAddresses: userProfile?.savedAddresses,
+                orderHistory: userProfile?.orderHistory,
+                wishlistItems: userProfile?.wishlistItems,
+                cartItems: userProfile?.cartItems,
+                isLoggedIn: false,
+
+            };
+
+            // Update Redux store with the full user profile
+            login(userInfo)
+            if (response?.token) {
 
                 toast({
                     title: "Login Successful",
@@ -62,6 +85,8 @@ export default function Login() {
                 navigate('/');
             }
         } catch (error) {
+            console.log(error);
+
             toast({
                 title: "Login Failed",
                 description: "Please check your credentials and try again.",
@@ -84,19 +109,24 @@ export default function Login() {
 
             // Fetch the full user profile
             const userProfile = await getUserProfile();
-            // console.log("user data", userProfile);
 
-            //making new object for the redux
+            console.log("user data", userProfile);
+
             const userInfo = {
-                id: userProfile?._id,
+                _id: userProfile?._id,
                 name: userProfile?.name,
                 email: userProfile?.email,
-                isLoggedIn: true,
+                phoneNumber: userProfile?.phoneNumber,
+                savedAddresses: userProfile?.savedAddresses,
+                orderHistory: userProfile?.orderHistory,
+                wishlistItems: userProfile?.wishlistItems,
+                cartItems: userProfile?.cartItems,
+                isLoggedIn: false,
+
             };
 
-
             // Update Redux store with the full user profile
-            updateUserInfo(userInfo);
+            login(userInfo)
 
             toast({
                 title: "Registration Successful",
@@ -104,6 +134,8 @@ export default function Login() {
             });
             navigate('/');
         } catch (error) {
+            console.log(error);
+
             toast({
                 title: "Registration Failed",
                 description: "An error occurred. Please try again.",
@@ -113,8 +145,8 @@ export default function Login() {
     };
 
     return (
-        <div className="flex flex-col w-full">
-            <Card className="max-w-full w-[340px] ">
+        <div className="flex mt-24 justify-center  h-screen w-full">
+            <Card className="max-w-full h-fit w-[340px] ">
                 <CardBody className="overflow-hidden">
                     <Tabs
                         fullWidth
@@ -155,7 +187,7 @@ export default function Login() {
 
                                 <p className="text-center text-small">
                                     Need to create an account?{" "}
-                                    <Link size="sm" onPress={() => setSelected("sign-up")}>
+                                    <Link size="sm" className="cursor-pointer underline font-semibold hover:bg-bsecondary/15" onPress={() => setSelected("sign-up")}>
                                         Sign up
                                     </Link>
                                 </p>
@@ -176,7 +208,7 @@ export default function Login() {
                                     placeholder="Enter your name"
                                     {...registerForm.register("name")}
                                 />
-                                {registerForm.formState.errors.name && <span>{registerForm.formState.errors.name.message}</span>}
+                                {registerForm.formState.errors.name && <span className="text-xs text-red-500 -mt-3">{registerForm.formState.errors.name.message}</span>}
 
                                 <Input
                                     isRequired
@@ -184,7 +216,7 @@ export default function Login() {
                                     placeholder="Enter your email"
                                     {...registerForm.register("email")}
                                 />
-                                {registerForm.formState.errors.email && <span>{registerForm.formState.errors.email.message}</span>}
+                                {registerForm.formState.errors.email && <span className="text-xs text-red-500 -mt-3">{registerForm.formState.errors.email.message}</span>}
 
                                 <Input
                                     isRequired
@@ -202,12 +234,12 @@ export default function Login() {
                                         </button>
                                     }
                                 />
-                                {registerForm.formState.errors.password && <span>{registerForm.formState.errors.password.message}</span>}
+                                {registerForm.formState.errors.password && <span className="text-xs text-red-500 -mt-3">{registerForm.formState.errors.password.message}</span>}
 
 
                                 <p className="text-center text-small">
                                     Already have an account?{" "}
-                                    <Link size="sm" onPress={() => setSelected("login")}>
+                                    <Link size="sm" className="cursor-pointer underline font-semibold hover:bg-bsecondary/15" onPress={() => setSelected("login")}>
                                         Login
                                     </Link>
                                 </p>

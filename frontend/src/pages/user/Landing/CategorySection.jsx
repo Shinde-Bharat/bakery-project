@@ -29,7 +29,7 @@ function CategorySection() {
 
         fetchData(); // Invoke the fetch function when the component mounts
     }, []);
-    console.log(bakeryData[0]);
+    // console.log(bakeryData[0]);
 
     const categories = [
         {
@@ -105,7 +105,7 @@ function CategorySection() {
             <div className="grid grid-cols-4 my-12">
                 {filteredProducts.map((product) => (
                     <ProductCard
-                        key={product.id}
+                        key={product._id}
                         product={product}
                         onAddToCart={() => addToCart(product.id)}
                         onRemoveFromFavorites={() => removeFromFavorites(product.id)}
