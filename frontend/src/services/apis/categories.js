@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getTokens, replaceJWTIfRefreshed } from './utils/authToken';
+import { getTokens, replaceJWTIfRefreshed } from '../utils/authToken';
 import { API_URL } from '@/constants/constants';
 
 // Categories

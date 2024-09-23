@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { getTokens, replaceJWTIfRefreshed } from './utils/authToken';
 import { API_URL } from '@/constants/constants';
+import { getTokens, replaceJWTIfRefreshed } from '../utils/authToken';
 // Products
 export const createProduct = async (productData) => {
     try {

@@ -2,6 +2,8 @@
 // Helper function to get tokens from localStorage
 export const getTokens = () => {
     const user = JSON.parse(localStorage.getItem('user'));
+    console.log(user);
+
     return {
         token: user?.token,
         refreshToken: user?.refreshToken

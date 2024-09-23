@@ -50,9 +50,12 @@ export const updateUserProfile = async (profileData) => {
             },
         });
         replaceJWTIfRefreshed(response);
+        console.log(profileData, "updated");
+
         return response.data;
     } catch (error) {
-        console.error("Updating user profile failed:", error);
+
+        console.error("Updating user profile failed:", error, token);
         throw error;
     }
 };

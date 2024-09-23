@@ -8,23 +8,25 @@ import cake from '../../assets/categories/cake.jpg'
 import { useCart, useWishlist } from "@/hooks/reduxHooks";
 // Accepting product details and action handlers as props
 export default function ProductCard({ product, onAddToCart, onRemoveFromFavorites, inCart }) {
+
     const navigate = useNavigate();
     const { addToWishlist, wishlist, removeFromWishlist } = useWishlist()
     const { cart, addItem, removeItem } = useCart()
-    const isInWishlist = wishlist.some(item => item.id === product.id);
-    const isInCart = cart.items.some(item => item.id === product.id);
+
+    const isInWishlist = wishlist.some(item => item._id === product._id);
+    const isInCart = cart.items.some(item => item._id === product._id);
 
     return (
 
         <Card className="w-fit mt-6 font-Montserrat hover:scale-105 hover:transition-all hover:ease-in" isBlurred>
             <CardBody className="overflow-visible relative">
                 <div className="absolute z-20 top-5 left-5">
-                    <Chip color="primary" size="sm" variant="shadow">{product.category.name}</Chip>
+                    <Chip color="primary" size="sm" variant="shadow">{product.category?.name}</Chip>
                 </div>
                 <Image
                     alt={product.name}
                     isBlurred
-                    onClick={() => { navigate('/product') }}
+                    onClick={() => { navigate(`/product/${product._id}`) }}
                     isZoomed
                     className="object-cover rounded-xl cursor-pointer aspect-square"
                     src={cake}
@@ -35,7 +37,7 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
             <CardFooter className="pb-0 flex flex-col items-stretch">
                 <div className="flex justify-between">
                     <Tooltip content={product.name}>
-                        <h4 onClick={() => { navigate('/product') }} className="text-medium font-bold text-bprimary cursor-pointer w-4/5 text-nowrap text-ellipsis overflow-hidden">{product.name}</h4>
+                        <h4 onClick={() => { navigate(`/product/${product._id}`) }} className="text-medium font-bold text-bprimary cursor-pointer w-4/5 text-nowrap text-ellipsis overflow-hidden">{product.name}</h4>
                     </Tooltip>
                     {/* Ratings */}
                     <div className="flex items-center">
@@ -60,7 +62,7 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
                             onPress={(e) => {
                                 // onRemoveFromFavorites();
                                 if (isInWishlist) {
-                                    removeFromWishlist(product.id); // Function to remove item from cart
+                                    removeFromWishlist(product._id); // Function to remove item from cart
                                 } else {
                                     addToWishlist(product); // Function to add item to cart
                                 }
@@ -78,7 +80,7 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
                             // disabled={inCart} // Disable button if in cart
                             onPress={(e) => {
                                 if (isInCart) {
-                                    removeItem(product.id); // Function to remove item from cart
+                                    removeItem(product._id); // Function to remove item from cart
                                 } else {
                                     addItem(product); // Function to add item to cart
                                 }

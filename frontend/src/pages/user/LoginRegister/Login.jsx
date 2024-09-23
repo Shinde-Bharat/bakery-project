@@ -7,7 +7,6 @@ import { getUserProfile, loginUser, registerUser } from '@/services/apis/user';
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { jwtDecode } from "jwt-decode";
 import { useUser } from "@/hooks/reduxHooks";
 
 // Define the login and register schemas with zod

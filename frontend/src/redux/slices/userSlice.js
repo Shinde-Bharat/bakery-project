@@ -4,6 +4,7 @@ import { getUserProfile, updateUserProfile } from '@/services/apis/user';
 export const fetchUserProfile = createAsyncThunk(
     'user/fetchProfile',
     async () => {
+
         const response = await getUserProfile();
         return response.data;
     }
@@ -11,6 +12,7 @@ export const fetchUserProfile = createAsyncThunk(
 export const updateProfile = createAsyncThunk(
     'user/updateProfile',
     async (profileData) => {
+
         const response = await updateUserProfile(profileData);
         return response.data;
     }

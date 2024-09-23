@@ -7,20 +7,24 @@ import bagutte from '../../../assets/categories/bagutte.png';
 import croinssant from '../../../assets/categories/croinssant.png';
 import cupcake from '../../../assets/categories/cupcake.png';
 import donut from '../../../assets/categories/donut.png';
+import { getAllProducts } from '@/services/apis/products';
+import { getAllCategories } from '@/services/apis/categories';
 
 function CategorySection() {
 
     const [bakeryData, setbakeryData] = useState([])
+    const [categories, setCategories] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState();
+
     useEffect(() => {
         // Function to fetch data
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/products/');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const result = await response.json();
-                setbakeryData(result); // Set the fetched data
+                const products = await getAllProducts()
+                setbakeryData(products);
+                const categories = await getAllCategories()
+                setCategories(categories)
+                setSelectedCategory(categories[0]?.name)
             } catch (error) {
                 console.log(error);
 
@@ -29,38 +33,37 @@ function CategorySection() {
 
         fetchData(); // Invoke the fetch function when the component mounts
     }, []);
-    // console.log(bakeryData[0]);
+    // console.log(categories);
 
-    const categories = [
-        {
-            id: 1,
-            categoryName: "Cake",
-            image: cupcake, // Replace with actual image URL
-        },
-        {
-            id: 2,
-            categoryName: "Croinssant",
-            image: croinssant, // Replace with actual image URL
-        },
-        {
-            id: 3,
-            categoryName: "Bun",
-            image: bun, // Replace with actual image URL
-        },
-        {
-            id: 4,
-            categoryName: "Bagutte",
-            image: bagutte, // Replace with actual image URL
-        },
-        {
-            id: 5,
-            categoryName: "Donut",
-            image: donut, // Replace with actual image URL
-        }
-    ];
+    // const categories = [
+    //     {
+    //         id: 1,
+    //         categoryName: "Cake",
+    //         image: cupcake, // Replace with actual image URL
+    //     },
+    //     {
+    //         id: 2,
+    //         categoryName: "Croinssant",
+    //         image: croinssant, // Replace with actual image URL
+    //     },
+    //     {
+    //         id: 3,
+    //         categoryName: "Bun",
+    //         image: bun, // Replace with actual image URL
+    //     },
+    //     {
+    //         id: 4,
+    //         categoryName: "Bagutte",
+    //         image: bagutte, // Replace with actual image URL
+    //     },
+    //     {
+    //         id: 5,
+    //         categoryName: "Donut",
+    //         image: donut, // Replace with actual image URL
+    //     }
+    // ];
 
 
-    const [selectedCategory, setSelectedCategory] = useState("Cake");
 
     // Function to handle category selection
     const handleCategoryClick = (categoryName) => {
@@ -72,6 +75,8 @@ function CategorySection() {
         ?
         bakeryData.filter((product) => product.category?.name === selectedCategory)
         : bakeryData; // Show all products if no category is selected
+
+    console.log("filterd", filteredProducts);
 
 
 
@@ -91,12 +96,12 @@ function CategorySection() {
                 <div className="flex justify-around gap-8">
                     {categories.map((category) => (
                         <CategoryCard
-                            key={category.id}
-                            id={category.id}
-                            categoryName={category.categoryName}
-                            img={category.image}
-                            isClicked={category.categoryName === selectedCategory}
-                            handleCategoryClick={() => handleCategoryClick(category.categoryName)} // Pass categoryName here
+                            key={category._id}
+                            id={category._id}
+                            categoryName={category.name}
+                            img={category.imgURL}
+                            isClicked={category.name === selectedCategory}
+                            handleCategoryClick={() => handleCategoryClick(category.name)} // Pass categoryName here
                         />
                     ))}
                 </div>
@@ -107,8 +112,8 @@ function CategorySection() {
                     <ProductCard
                         key={product._id}
                         product={product}
-                        onAddToCart={() => addToCart(product.id)}
-                        onRemoveFromFavorites={() => removeFromFavorites(product.id)}
+                        onAddToCart={() => addToCart(product._id)}
+                        onRemoveFromFavorites={() => removeFromFavorites(product._id)}
                     />
                 ))}
             </div>
