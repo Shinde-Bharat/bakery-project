@@ -9,6 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCart, useWishlist } from '@/hooks/reduxHooks';
 import { getProduct } from '@/services/apis/products';
 import { Image } from '@nextui-org/react';
+import { toast } from '@/hooks/use-toast';
 
 export default function ProductDetails() {
     const [quantity, setQuantity] = useState(1)
@@ -16,7 +17,7 @@ export default function ProductDetails() {
     const navigate = useNavigate()
 
     const { addToWishlist, wishlist, removeFromWishlist } = useWishlist()
-    const { cart, addItem, removeItem } = useCart()
+    const { cart, addItem, removeItem, updateItemQuantity } = useCart()
 
     const { id } = useParams()
 
@@ -24,8 +25,12 @@ export default function ProductDetails() {
         const fetchData = async () => {
             try {
                 const productData = await getProduct(id)
-                console.log("product data ", productData);
+                // console.log("product data ", productData);
                 setProduct(productData)
+
+                // Set initial quantity to 1 or the cart item quantity if it exists
+                const cartItem = cart.items.find(item => item._id === productData._id)
+                setQuantity(cartItem ? cartItem.quantity : 1)
             } catch (error) {
                 console.log(error);
             }
@@ -38,16 +43,38 @@ export default function ProductDetails() {
     const isInCart = product && cart.items.some(item => item._id === product._id);
 
     const handleQuantityChange = (amount) => {
-        setQuantity(Math.max(1, quantity + amount))
+        if (!product) return;
+
+        const newQuantity = quantity + amount;
+        if (newQuantity < 1) {
+            toast({
+                title: "Minimum quantity reached",
+                description: "Quantity cannot be less than 1.",
+                variant: "warning",
+            });
+            return;
+        }
+        if (newQuantity > product.avlQuantity) {
+            toast({
+                title: "Maximum quantity reached",
+                description: `Only ${product.avlQuantity} items available in stock.`,
+                variant: "warning",
+            });
+            return;
+        }
+        setQuantity(newQuantity);
+
+        // Update cart if the item is already in the cart
+        if (isInCart) {
+            updateItemQuantity(product._id, newQuantity);
+            console.log(cart);
+
+        }
     }
 
     if (!product) {
         return <div>Loading...</div>; // Or any loading indicator
     }
-
-    // const isInWishlist = wishlist.some(item => item._id === product._id);
-    // const isInCart = cart.items.some(item => item._id === product._id);
-
 
 
     // const product = {
@@ -120,7 +147,6 @@ export default function ProductDetails() {
                                 variant="flat"
                                 color='primary'
                                 onPress={(e) => {
-                                    // onRemoveFromFavorites();
                                     if (isInWishlist) {
                                         removeFromWishlist(product._id); // Function to remove item from cart
                                     } else {

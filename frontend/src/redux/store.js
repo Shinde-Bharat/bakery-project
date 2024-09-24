@@ -5,16 +5,19 @@ import { combineReducers } from 'redux';
 import cartSlice from "./slices/cartSlice";
 import wishlistSlice from "./slices/wishlistSlice";
 import userSlice from "./slices/userSlice";
+import orderSummarySlice from "./slices/orderSummerySlice";
 
 const persistConfig = {
     key: 'root',
     storage,
+    whitelist: ['cart', 'wishlist', 'user'], // Only persist these slices
 };
 
 const rootReducer = combineReducers({
     cart: cartSlice,
     wishlist: wishlistSlice,
-    user: userSlice
+    user: userSlice,
+    orderSummary: orderSummarySlice, //this is not persist
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

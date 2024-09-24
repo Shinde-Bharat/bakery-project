@@ -32,8 +32,8 @@ const cartSlice = createSlice({
             state.total = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
         },
         updateItemQuantity: (state, action) => {
-            const { _id, quantity } = action.payload;
-            const item = state.items.find(item => item._id === _id);
+            const { id, quantity } = action.payload;
+            const item = state.items.find(item => item._id === id);
             if (item) {
                 item.quantity = quantity;
             }

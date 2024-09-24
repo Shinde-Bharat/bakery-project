@@ -2,7 +2,8 @@ import { useState } from "react"
 import { Minus, Plus, Trash2 } from "lucide-react"
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Button, Input } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "@/hooks/reduxHooks";
+import { useCart, useOrderSummary } from "@/hooks/reduxHooks";
+import { toast } from "@/hooks/use-toast";
 
 
 // Mock data for cart items
@@ -28,23 +29,41 @@ export default function CartPage() {
     const [appliedCoupon, setAppliedCoupon] = useState(null)
     const [cartItems, setCartItems] = useState(initialCartItems)
     const { cart, removeItem, updateItemQuantity } = useCart()
-    console.log(cart);
+    const { setOrderSummary } = useOrderSummary()
+
+
+
+
+    // console.log(cart);
 
     const navigate = useNavigate()
 
-    const updateQuantity = (id, newQuantity) => {
-        if (newQuantity >= 0) {
-            setCartItems(
-                cartItems.map((item) =>
-                    item.id === id ? { ...item, quantity: newQuantity } : item
-                )
-            )
+    const handleQuantityChange = (itemId, newQuantity) => {
+        const item = cart.items.find(item => item._id === itemId);
+        if (!item) return;
+
+        if (newQuantity < 1) {
+            toast({
+                title: "Minimum quantity reached",
+                description: "Quantity cannot be less than 1.",
+                variant: "warning",
+            });
+            return;
         }
+
+        if (newQuantity > item.avlQuantity) {
+            toast({
+                title: "Maximum quantity reached",
+                description: `Only ${item.avlQuantity} items available in stock.`,
+                variant: "warning",
+            });
+            return;
+        }
+
+        updateItemQuantity(itemId, newQuantity);
     }
 
-
-
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const tax = subtotal * 0.1 // Assuming 10% tax
 
     // Apply ongoing offer
@@ -58,8 +77,17 @@ export default function CartPage() {
         if (coupon) {
             setAppliedCoupon(coupon)
             setCouponCode("")
+            toast({
+                title: "Coupon applied",
+                description: `${coupon.code} coupon has been applied successfully.`,
+                variant: "success",
+            });
         } else {
-            alert("Invalid coupon code")
+            toast({
+                title: "Invalid coupon",
+                description: "The entered coupon code is invalid.",
+                variant: "error",
+            });
         }
     }
 
@@ -70,6 +98,18 @@ export default function CartPage() {
         : 0
 
     const total = subtotal + tax - ongoingOfferDiscount - couponDiscount
+
+    const handleCheckout = () => {
+        const orderSummary = {
+            items: cart.items,
+            subtotal: subtotal,
+            tax: tax,
+            total: total,
+        };
+
+        setOrderSummary(orderSummary);
+        navigate('/checkout')
+    }
 
     return (
         <div className="px-24 py-8 font-Montserrat">
@@ -90,9 +130,9 @@ export default function CartPage() {
                             </TableHeader>
                             <TableBody>
                                 {cart.items.map((item) => (
-                                    <TableRow key={item.id}>
+                                    <TableRow key={item._id}>
                                         <TableCell>
-                                            <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                                            <img src={item.imageURL} alt={item.name} className="w-16 h-16 object-cover rounded" />
                                         </TableCell>
                                         <TableCell className="font-medium">{item.name}</TableCell>
                                         <TableCell>
@@ -101,7 +141,7 @@ export default function CartPage() {
                                                     variant="flat"
                                                     size="icon"
                                                     color='primary'
-                                                    onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                                                    onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
                                                 >
                                                     <Minus className="h-4 w-4" />
                                                 </Button>
@@ -109,14 +149,14 @@ export default function CartPage() {
                                                     type="number"
                                                     min="0"
                                                     value={item.quantity}
-                                                    onChange={(e) => updateItemQuantity(item.id, parseInt(e.target.value))}
+                                                    onChange={(e) => handleQuantityChange(item._id, parseInt(e.target.value))}
                                                     className="w-16 text-center"
                                                 />
                                                 <Button
                                                     variant="flat"
                                                     color='primary'
                                                     size="icon"
-                                                    onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                                                    onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
                                                 >
                                                     <Plus className="h-4 w-4" />
                                                 </Button>
@@ -176,7 +216,7 @@ export default function CartPage() {
                                     Apply Coupon
                                 </Button>
                             </div>
-                            <Button onPress={() => navigate('/checkout')} variant="shadow" color="primary" className="w-full mt-6">
+                            <Button onPress={handleCheckout} variant="shadow" color="primary" className="w-full mt-6">
                                 Proceed to Checkout
                             </Button>
                         </div>
