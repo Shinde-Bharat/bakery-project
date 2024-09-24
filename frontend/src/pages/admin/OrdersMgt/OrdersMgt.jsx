@@ -171,7 +171,7 @@ export default function OrderManagementPage() {
                                 <TableCell>{order.id}</TableCell>
                                 <TableCell>{order.customer}</TableCell>
                                 <TableCell>{order.date}</TableCell>
-                                <TableCell>${order.total.toFixed(2)}</TableCell>
+                                <TableCell>₹{order.total.toFixed(2)}</TableCell>
                                 <TableCell>
                                     <Badge className={statusColors[order.status]}>
                                         {order.status}
@@ -244,9 +244,9 @@ export default function OrderManagementPage() {
                                                     {order.items.map((item) => (
                                                         <TableRow key={item.id}>
                                                             <TableCell>{item.name}</TableCell>
-                                                            <TableCell>${item.price.toFixed(2)}</TableCell>
+                                                            <TableCell>₹{item.price.toFixed(2)}</TableCell>
                                                             <TableCell>{item.quantity}</TableCell>
-                                                            <TableCell>${(item.price * item.quantity).toFixed(2)}</TableCell>
+                                                            <TableCell>₹{(item.price * item.quantity).toFixed(2)}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>

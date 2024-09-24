@@ -250,9 +250,9 @@ export default function CheckoutPage() {
                                                 {order.items.map((item) => (
                                                     <TableRow key={item._id}>
                                                         <TableCell>{item.name}</TableCell>
-                                                        <TableCell>${item.price.toFixed(2)}</TableCell>
+                                                        <TableCell>₹{item.price.toFixed(2)}</TableCell>
                                                         <TableCell>{item.quantity}</TableCell>
-                                                        <TableCell className="text-right">${(item.price * item.quantity).toFixed(2)}</TableCell>
+                                                        <TableCell className="text-right">₹{(item.price * item.quantity).toFixed(2)}</TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
@@ -260,7 +260,7 @@ export default function CheckoutPage() {
 
                                         <div className="flex justify-between text-lg font-bold">
                                             <span>Total</span>
-                                            <span>${order.total.toFixed(2)}</span>
+                                            <span>₹{order.total.toFixed(2)}</span>
                                         </div>
                                     </div>
                                 )}

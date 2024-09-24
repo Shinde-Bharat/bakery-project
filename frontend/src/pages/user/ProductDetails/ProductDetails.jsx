@@ -118,7 +118,7 @@ export default function ProductDetails() {
                             ))}
                             <span className="ml-2 text-sm text-gray-600">{product.rating} ({product.reviews.length} reviews)</span>
                         </div>
-                        <p className="text-2xl font-bold text-primary mb-4">${product.price.toFixed(2)}</p>
+                        <p className="text-2xl font-bold text-primary mb-4">₹{product.price.toFixed(2)}</p>
                         <p className="mb-6">{product.description}</p>
                         <div className="flex items-center mb-6">
                             <Button color='primary' variant="flat" size="icon" onClick={() => handleQuantityChange(-1)}>

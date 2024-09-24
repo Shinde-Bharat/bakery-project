@@ -160,15 +160,20 @@ export default function Login() {
                                 <Input
                                     isRequired
                                     label="Email"
+                                    isInvalid={!!loginForm.formState.errors.email}
+                                    errorMessage={loginForm.formState.errors.email?.message}
                                     placeholder="Enter your email"
                                     {...loginForm.register("email")}
                                 />
-                                {loginForm.formState.errors.email && <span className="text-xs text-red-500 -mt-3">{loginForm.formState.errors.email.message}</span>}
+
 
                                 <Input
                                     isRequired
                                     label="Password"
                                     placeholder="Enter your password"
+
+                                    isInvalid={!!loginForm.formState.errors.password}
+                                    errorMessage={loginForm.formState.errors.password?.message}
                                     type={showPassword ? "text" : "password"}
                                     endContent={
                                         <button className="focus:outline-none" type="button" onClick={() => setShowPassword(!showPassword)} aria-label="toggle password visibility">
@@ -182,7 +187,7 @@ export default function Login() {
 
                                     {...loginForm.register("password")}
                                 />
-                                {loginForm.formState.errors.password && <span className="text-xs text-red-500 -mt-3">{loginForm.formState.errors.password.message}</span>}
+
 
                                 <p className="text-center text-small">
                                     Need to create an account?{" "}
@@ -204,22 +209,28 @@ export default function Login() {
                                 <Input
                                     isRequired
                                     label="Name"
+                                    isInvalid={!!registerForm.formState.errors.name}
+                                    errorMessage={registerForm.formState.errors.name?.message}
                                     placeholder="Enter your name"
                                     {...registerForm.register("name")}
                                 />
-                                {registerForm.formState.errors.name && <span className="text-xs text-red-500 -mt-3">{registerForm.formState.errors.name.message}</span>}
+
 
                                 <Input
                                     isRequired
                                     label="Email"
+                                    isInvalid={!!registerForm.formState.errors.email}
+                                    errorMessage={registerForm.formState.errors.email?.message}
                                     placeholder="Enter your email"
                                     {...registerForm.register("email")}
                                 />
-                                {registerForm.formState.errors.email && <span className="text-xs text-red-500 -mt-3">{registerForm.formState.errors.email.message}</span>}
+
 
                                 <Input
                                     isRequired
                                     label="Password"
+                                    isInvalid={!!registerForm.formState.errors.password}
+                                    errorMessage={registerForm.formState.errors.password?.message}
                                     placeholder="Enter your password"
                                     type={showPassword ? "text" : "password"}
                                     {...registerForm.register("password")}

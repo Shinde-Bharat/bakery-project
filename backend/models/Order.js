@@ -13,6 +13,8 @@ const orderSchema = new mongoose.Schema({
         name: String,
         number: String
     },
+    shippingAddress: { type: String, required: true },
+    postalCode: { type: String, required: true },
     date: { type: Date, default: Date.now },
     total: Number,
     status: {

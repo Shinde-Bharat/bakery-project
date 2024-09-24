@@ -2,7 +2,6 @@ import React from 'react';
 // import { ArrowRight } from 'lucide-react';
 
 import { BrowserRouter as Router, Routes, Route, } from "react-router-dom";
-import LadingPage from './pages/user/Landing/LadingPage';
 import ProductDetails from './pages/user/ProductDetails/ProductDetails';
 import Layout from './pages/user/Layout';
 import ExplorePage from './pages/user/ExplorePage/ExplorePage';
@@ -25,6 +24,9 @@ import DeliveryProfile from './pages/delivery/DeliveryProfile/DeliveryProfile';
 import MyOrders from './pages/delivery/MyOrders/MyOrders';
 import PrivacyPolicy from './pages/user/privacy_policy/PrivacyPolicy';
 import Login from './pages/user/LoginRegister/Login';
+import AdminLogin from './pages/admin/AdminLogin/AdminLogin';
+import DeliveryLogin from './pages/delivery/DeliveryLogin/DeliveryLogin';
+import LandingPage from './pages/user/Landing/LandingPage';
 
 // color-amber
 
@@ -37,7 +39,7 @@ const App = () => {
       <Router>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route path="/" element={<LadingPage />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/profile" element={<UserProfilePage />} />
             <Route path="/explore" element={<ExplorePage />} />
@@ -46,8 +48,8 @@ const App = () => {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/confirmedOrdered/:id" element={<OrderConfirmedPage />} />
             <Route path="/track" element={<TrackOrderPage />} />
-
           </Route>
+
           <Route path="/login" element={<Login />} />
           <Route path="/privacy_policy" element={<PrivacyPolicy />} />
 
@@ -59,12 +61,14 @@ const App = () => {
             <Route path="/admin/discounts" element={<DiscountCouponsMgt />} />
             <Route path="/admin/reviews_messages" element={<MessageReviewsMgt />} />
           </Route>
+          <Route path="/admin/login" element={<AdminLogin />} />
+
           <Route path="/delivery" element={<DeliveryLayout />}>
             <Route path="/delivery" element={<DeliveryDashboard />} />
             <Route path="/delivery/orders" element={<MyOrders />} />
             <Route path="/delivery/profile" element={<DeliveryProfile />} />
-
           </Route>
+          <Route path="/delivery/login" element={<DeliveryLogin />} />
 
 
         </Routes>

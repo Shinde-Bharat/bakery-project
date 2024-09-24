@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom'
 
 function SideNav({ navItems }) {
     return (
-        <aside className="w-fit bg-white shadow-md">
+        <aside className="w-fit bg-bternary shadow-md border-r-1">
             <div className="p-4">
                 <h2 className="text-2xl font-bold text-gray-800">Admin Panel</h2>
             </div>

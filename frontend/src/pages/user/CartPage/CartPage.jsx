@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Minus, Plus, Trash2 } from "lucide-react"
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Button, Input } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Button, Input, Image } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { useCart, useOrderSummary } from "@/hooks/reduxHooks";
 import { toast } from "@/hooks/use-toast";
@@ -132,7 +132,7 @@ export default function CartPage() {
                                 {cart.items.map((item) => (
                                     <TableRow key={item._id}>
                                         <TableCell>
-                                            <img src={item.imageURL} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                                            <Image isBlurred src={item.imageURL} alt={item.name} className="w-16 h-16 object-cover rounded" />
                                         </TableCell>
                                         <TableCell className="font-medium">{item.name}</TableCell>
                                         <TableCell>
@@ -162,8 +162,8 @@ export default function CartPage() {
                                                 </Button>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
-                                        <TableCell className="text-right">${(item.price * item.quantity).toFixed(2)}</TableCell>
+                                        <TableCell className="text-right">₹{item.price.toFixed(2)}</TableCell>
+                                        <TableCell className="text-right">₹{(item.price * item.quantity).toFixed(2)}</TableCell>
                                         <TableCell>
                                             <Button variant="light" size="icon" onClick={() => removeItem(item.id)}>
                                                 <Trash2 className="h-4 w-4" />
@@ -180,28 +180,28 @@ export default function CartPage() {
                             <div className="space-y-2">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
-                                    <span>${subtotal.toFixed(2)}</span>
+                                    <span>₹{subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Tax</span>
-                                    <span>${tax.toFixed(2)}</span>
+                                    <span>₹{tax.toFixed(2)}</span>
                                 </div>
                                 {ongoingOfferDiscount > 0 && (
                                     <div className="flex justify-between text-green-600">
                                         <span>Ongoing Offer ({ongoingOffer.description})</span>
-                                        <span>-${ongoingOfferDiscount.toFixed(2)}</span>
+                                        <span>-₹{ongoingOfferDiscount.toFixed(2)}</span>
                                     </div>
                                 )}
                                 {appliedCoupon && (
                                     <div className="flex justify-between text-green-600">
                                         <span>Coupon Discount ({appliedCoupon.code})</span>
-                                        <span>-${couponDiscount.toFixed(2)}</span>
+                                        <span>-₹{couponDiscount.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="border-t pt-2 mt-2">
                                     <div className="flex justify-between font-semibold">
                                         <span>Total</span>
-                                        <span>${total.toFixed(2)}</span>
+                                        <span>₹{total.toFixed(2)}</span>
                                     </div>
                                 </div>
                             </div>
