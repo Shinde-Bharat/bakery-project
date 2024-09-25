@@ -1,4 +1,6 @@
-import { useState } from 'react'
+"use client"
+
+import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,40 +9,70 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MapPin, Package, Truck, User, Search, CheckCircle } from 'lucide-react'
 import { Button } from '@nextui-org/button'
 import { Input } from '@nextui-org/react'
-
-// Mock data for new orders
-const initialOrders = [
-    { id: 1, customerName: "John Doe", address: "123 Main St, City", pincode: "110001", items: 2, status: "Pending" },
-    { id: 2, customerName: "Jane Smith", address: "456 Elm St, Town", pincode: "110002", items: 1, status: "Pending" },
-    { id: 3, customerName: "Bob Johnson", address: "789 Oak St, Village", pincode: "110001", items: 3, status: "Pending" },
-    { id: 4, customerName: "Alice Brown", address: "101 Pine St, County", pincode: "110003", items: 2, status: "Pending" },
-]
+import { getPackedOrders, acceptOrder, getAcceptedOrders, updateOrderStatus } from '@/services/apis/delivery'
 
 export default function DeliveryDashboard() {
-    const [orders, setOrders] = useState(initialOrders)
+    const [packedOrders, setPackedOrders] = useState([])
+    const [acceptedOrders, setAcceptedOrders] = useState([])
     const [searchTerm, setSearchTerm] = useState("")
     const [pincodeFilter, setPincodeFilter] = useState("")
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
-    const filteredOrders = orders.filter((order) =>
-        (order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.address.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (pincodeFilter === "" || order.pincode === pincodeFilter)
+    useEffect(() => {
+        fetchOrders()
+    }, [])
+
+    const fetchOrders = async () => {
+        try {
+            setLoading(true)
+            const [packed, accepted] = await Promise.all([getPackedOrders(), getAcceptedOrders()])
+            setPackedOrders(packed)
+            setAcceptedOrders(accepted)
+            setError(null)
+        } catch (err) {
+            setError("Failed to fetch orders. Please try again.")
+            console.error("Error fetching orders:", err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const filteredPackedOrders = packedOrders.filter((order) =>
+        (order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.shippingAddress.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (pincodeFilter === "" || order.postalCode === pincodeFilter)
     )
 
-    const handleAccept = (orderId) => {
-        setOrders(orders.map(order =>
-            order.id === orderId ? { ...order, status: "Accepted" } : order
-        ))
+    const handleAccept = async (orderId) => {
+        try {
+            await acceptOrder(orderId)
+            fetchOrders() // Refresh both packed and accepted orders
+        } catch (error) {
+            console.error("Error accepting order:", error)
+        }
     }
+
+    const handleUpdateStatus = async (orderId, status) => {
+        try {
+            await updateOrderStatus(orderId, status)
+            fetchOrders() // Refresh both packed and accepted orders
+        } catch (error) {
+            console.error("Error updating order status:", error)
+        }
+    }
+
+    if (loading) return <div>Loading orders...</div>
+    if (error) return <div>Error: {error}</div>
 
     return (
         <div className="container mx-auto px-4 py-8">
             <nav className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold">Delivery Dashboard</h1>
-                <div className="flex space-x-4 bg-red-600">
-                    <NavLink href="/new-orders" className="text-blue-600 hover:text-blue-800">New Orders</NavLink>
-                    <NavLink href="/my-orders" className="text-blue-600 hover:text-blue-800">My Orders</NavLink>
-                    <NavLink href="/profile" className="text-blue-600 hover:text-blue-800">Profile</NavLink>
+                <div className="flex space-x-4">
+                    <NavLink to="/new-orders" className="text-blue-600 hover:text-blue-800">New Orders</NavLink>
+                    <NavLink to="/my-orders" className="text-blue-600 hover:text-blue-800">My Orders</NavLink>
+                    <NavLink to="/profile" className="text-blue-600 hover:text-blue-800">Profile</NavLink>
                 </div>
             </nav>
 
@@ -51,8 +83,8 @@ export default function DeliveryDashboard() {
                         <Truck className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">24</div>
-                        <p className="text-xs text-muted-foreground">+10% from last month</p>
+                        <div className="text-2xl font-bold">{acceptedOrders.length}</div>
+                        <p className="text-xs text-muted-foreground">Total accepted orders</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -61,8 +93,8 @@ export default function DeliveryDashboard() {
                         <Package className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">13</div>
-                        <p className="text-xs text-muted-foreground">+2 since yesterday</p>
+                        <div className="text-2xl font-bold">{packedOrders.length}</div>
+                        <p className="text-xs text-muted-foreground">Orders ready for pickup</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -72,7 +104,7 @@ export default function DeliveryDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">98.5%</div>
-                        <p className="text-xs text-muted-foreground">+0.5% from last week</p>
+                        <p className="text-xs text-muted-foreground">Estimated on-time rate</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -82,78 +114,123 @@ export default function DeliveryDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">4.9/5</div>
-                        <p className="text-xs text-muted-foreground">Based on 120 reviews</p>
+                        <p className="text-xs text-muted-foreground">Estimated satisfaction rate</p>
                     </CardContent>
                 </Card>
             </div>
 
             <div className="space-y-4">
-                <div className='text-xl font-semibold'>New Orders</div>
+                <Tabs defaultValue="new-orders">
+                    <TabsList>
+                        <TabsTrigger value="new-orders">New Orders</TabsTrigger>
+                        <TabsTrigger value="my-orders">My Accepted Orders</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="new-orders">
+                        <div className="space-y-4">
+                            <div className='text-xl font-semibold'>New Orders</div>
 
+                            <div className="flex flex-col md:flex-row justify-between md:items-center space-y-2 md:space-y-0 md:space-x-2">
+                                <div className="flex-1 flex space-x-2">
+                                    <div className="flex-1">
+                                        <Label htmlFor="search" className="sr-only">Search orders</Label>
+                                        <div className="relative">
+                                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                            <Input
+                                                id="search"
+                                                placeholder="Search orders..."
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                className="pl-8"
+                                            />
+                                        </div>
+                                    </div>
 
-                <div className="flex flex-col md:flex-row justify-between md:items-center space-y-2 md:space-y-0 md:space-x-2">
-                    <div className="flex-1 flex space-x-2">
-                        <div className="flex-1">
-                            <Label htmlFor="search" className="sr-only">Search orders</Label>
-                            <div className="relative">
-                                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="search"
-                                    placeholder="Search orders..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-8"
-                                />
+                                </div>
+                            </div>
+
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {filteredPackedOrders.map((order) => (
+                                    <Card key={order._id}>
+                                        <CardHeader>
+                                            <CardTitle className="text-lg">Order #{order.orderId}</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center">
+                                                    <User className="h-4 w-4 mr-2 text-muted-foreground" />
+                                                    <span>{order.customer.name}</span>
+                                                </div>
+                                                <div className="flex items-start">
+                                                    <MapPin className="h-4 w-4 mr-2 mt-1 text-muted-foreground" />
+                                                    <span>{order.shippingAddress}</span>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <Package className="h-4 w-4 mr-2 text-muted-foreground" />
+                                                    <span>{order.items.length} item(s)</span>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                                                    <span>Pincode: {order.postalCode}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center mt-4">
+                                                    <Badge variant="secondary">
+                                                        {order.status}
+                                                    </Badge>
+                                                    <Button onClick={() => handleAccept(order._id)}>Accept</Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
                             </div>
                         </div>
-                        <div className="w-[150px]">
-                            <Label htmlFor="pincode-filter" className="sr-only">Filter by pincode</Label>
-                            <Input
-                                id="pincode-filter"
-                                placeholder="Filter by pincode"
-                                value={pincodeFilter}
-                                onChange={(e) => setPincodeFilter(e.target.value)}
-                            />
+                    </TabsContent>
+                    <TabsContent value="my-orders">
+                        <div className="space-y-4">
+                            <div className='text-xl font-semibold'>My Accepted Orders</div>
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {acceptedOrders.map((order) => (
+                                    <Card key={order._id}>
+                                        <CardHeader>
+                                            <CardTitle className="text-lg">Order #{order.orderId}</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center">
+                                                    <User className="h-4 w-4 mr-2 text-muted-foreground" />
+                                                    <span>{order.customer.name}</span>
+                                                </div>
+                                                <div className="flex items-start">
+                                                    <MapPin className="h-4 w-4 mr-2 mt-1 text-muted-foreground" />
+                                                    <span>{order.shippingAddress}</span>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <Package className="h-4 w-4 mr-2 text-muted-foreground" />
+                                                    <span>{order.items.length} item(s)</span>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                                                    <span>Pincode: {order.postalCode}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center mt-4">
+                                                    <Badge variant="secondary">
+                                                        {order.status}
+                                                    </Badge>
+                                                    {order.status === 'out for delivery' && (
+                                                        <Button onClick={() => handleUpdateStatus(order._id, 'delivered')}>
+                                                            Mark as Delivered
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    {filteredOrders.map((order) => (
-                        <Card key={order.id}>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Order #{order.id}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-2">
-                                    <div className="flex items-center">
-                                        <User className="h-4 w-4 mr-2 text-muted-foreground" />
-                                        <span>{order.customerName}</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                                        <span>{order.address}</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <Package className="h-4 w-4 mr-2 text-muted-foreground" />
-                                        <span>{order.items} item(s)</span>
-                                    </div>
-                                    <div className="flex justify-between items-center mt-4">
-                                        <Badge variant={order.status === "Pending" ? "secondary" : "success"}>
-                                            {order.status}
-                                        </Badge>
-                                        {order.status === "Pending" && (
-                                            <Button onClick={() => handleAccept(order.id)}>Accept</Button>
-                                        )}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-
+                    </TabsContent>
+                </Tabs>
             </div>
-
         </div>
     )
 }

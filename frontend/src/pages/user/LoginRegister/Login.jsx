@@ -144,8 +144,8 @@ export default function Login() {
     };
 
     return (
-        <div className="flex mt-24 justify-center  h-screen w-full">
-            <Card className="max-w-full h-fit w-[340px] ">
+        <div className="flex  justify-center  h-screen w-full ">
+            <Card className="max-w-full mt-24 h-fit w-[340px] ">
                 <CardBody className="overflow-hidden">
                     <Tabs
                         fullWidth

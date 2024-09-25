@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
+import { loginDeliveryBoy } from "@/services/apis/delivery";
 
 // Define the login and register schemas with zod
 const loginSchema = z.object({
@@ -29,7 +30,7 @@ function DeliveryLogin() {
     // Handle login submission
     const onLoginSubmit = async (values) => {
         try {
-            const response = await loginUser(values);
+            const response = await loginDeliveryBoy(values);
             console.log(response);
 
             localStorage.setItem('user', JSON.stringify({
@@ -43,7 +44,7 @@ function DeliveryLogin() {
                     title: "Login Successful",
                     description: "Welcome back!",
                 });
-                navigate('/');
+                navigate('/delivery');
             }
         } catch (error) {
             console.log(error);

@@ -1,6 +1,6 @@
+"use client"
 
-import { useState } from "react"
-
+import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import {
     Table,
@@ -27,92 +27,72 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Search, Filter, ChevronDown, ChevronUp } from "lucide-react"
+import { Search, Filter, ChevronDown, ChevronUp, MapPin } from "lucide-react"
 import { Button, Input } from "@nextui-org/react"
-
-// Mock data for orders
-const initialOrders = [
-    {
-        id: "ORD-001",
-        customer: "John Doe",
-        date: "2023-06-15",
-        total: 129.99,
-        status: "Processing",
-        items: [
-            { id: 1, name: "Wireless Earbuds", price: 79.99, quantity: 1 },
-            { id: 2, name: "Phone Case", price: 25.00, quantity: 2 },
-        ]
-    },
-    {
-        id: "ORD-002",
-        customer: "Jane Smith",
-        date: "2023-06-14",
-        total: 79.99,
-        status: "Shipped",
-        items: [
-            { id: 3, name: "Bluetooth Speaker", price: 59.99, quantity: 1 },
-            { id: 4, name: "USB Cable", price: 9.99, quantity: 2 },
-        ]
-    },
-    {
-        id: "ORD-003",
-        customer: "Bob Johnson",
-        date: "2023-06-13",
-        total: 199.99,
-        status: "Delivered",
-        items: [
-            { id: 5, name: "Smart Watch", price: 199.99, quantity: 1 },
-        ]
-    },
-    {
-        id: "ORD-004",
-        customer: "Alice Brown",
-        date: "2023-06-12",
-        total: 59.99,
-        status: "Processing",
-        items: [
-            { id: 6, name: "Portable Charger", price: 39.99, quantity: 1 },
-            { id: 7, name: "Screen Protector", price: 9.99, quantity: 2 },
-        ]
-    },
-    {
-        id: "ORD-005",
-        customer: "Charlie Davis",
-        date: "2023-06-11",
-        total: 149.99,
-        status: "Shipped",
-        items: [
-            { id: 8, name: "Wireless Mouse", price: 29.99, quantity: 1 },
-            { id: 9, name: "Keyboard", price: 89.99, quantity: 1 },
-            { id: 10, name: "Mouse Pad", price: 14.99, quantity: 2 },
-        ]
-    },
-]
+// import { getAllOrders, updateOrderStatusAdmin, assignDeliveryBoy } from "@/services/apis/orders"
+import { getAllOrders, updateOrderStatusAdmin, assignDeliveryBoy } from "@/services/apis/order"
 
 const statusColors = {
-    Processing: "bg-yellow-200 text-yellow-800",
-    Shipped: "bg-blue-200 text-blue-800",
-    Delivered: "bg-green-200 text-green-800",
+    processing: "bg-yellow-200 text-yellow-800",
+    packed: "bg-blue-200 text-blue-800",
+    "out for delivery": "bg-purple-200 text-purple-800",
+    delivered: "bg-green-200 text-green-800",
 }
 
 export default function OrderManagementPage() {
-    const [orders, setOrders] = useState(initialOrders)
+    const [orders, setOrders] = useState([])
     const [searchTerm, setSearchTerm] = useState("")
     const [statusFilter, setStatusFilter] = useState("All")
     const [selectedOrder, setSelectedOrder] = useState(null)
     const [expandedOrders, setExpandedOrders] = useState({})
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    useEffect(() => {
+        fetchOrders()
+    }, [])
+
+    const fetchOrders = async () => {
+        try {
+            setLoading(true)
+            const fetchedOrders = await getAllOrders()
+            setOrders(fetchedOrders)
+            setError(null)
+        } catch (err) {
+            setError("Failed to fetch orders. Please try again.")
+            console.error("Error fetching orders:", err)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const filteredOrders = orders.filter((order) => {
-        const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.customer.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesSearch = order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
         const matchesStatus = statusFilter === "All" || order.status === statusFilter
         return matchesSearch && matchesStatus
     })
 
-    const handleStatusChange = (orderId, newStatus) => {
-        setOrders(orders.map(order =>
-            order.id === orderId ? { ...order, status: newStatus } : order
-        ))
+    const handleStatusChange = async (orderId, newStatus) => {
+        try {
+            await updateOrderStatusAdmin(orderId, newStatus)
+            setOrders(orders.map(order =>
+                order._id === orderId ? { ...order, status: newStatus } : order
+            ))
+        } catch (error) {
+            console.error("Error updating order status:", error)
+        }
+    }
+
+    const handleAssignDeliveryBoy = async (orderId, deliveryBoyId) => {
+        try {
+            const updatedOrder = await assignDeliveryBoy(orderId, deliveryBoyId)
+            setOrders(orders.map(order =>
+                order._id === orderId ? updatedOrder : order
+            ))
+        } catch (error) {
+            console.error("Error assigning delivery boy:", error)
+        }
     }
 
     const toggleOrderExpansion = (orderId) => {
@@ -121,6 +101,11 @@ export default function OrderManagementPage() {
             [orderId]: !prev[orderId]
         }))
     }
+
+    if (loading) return <div>Loading orders...</div>
+    if (error) return <div>Error: {error}</div>
+    console.log(orders);
+
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -145,9 +130,10 @@ export default function OrderManagementPage() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="All">All Statuses</SelectItem>
-                            <SelectItem value="Processing">Processing</SelectItem>
-                            <SelectItem value="Shipped">Shipped</SelectItem>
-                            <SelectItem value="Delivered">Delivered</SelectItem>
+                            <SelectItem value="processing">Processing</SelectItem>
+                            <SelectItem value="packed">Packed</SelectItem>
+                            <SelectItem value="out for delivery">Out for Delivery</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -167,10 +153,10 @@ export default function OrderManagementPage() {
                 <TableBody>
                     {filteredOrders.map((order) => (
                         <>
-                            <TableRow key={order.id}>
-                                <TableCell>{order.id}</TableCell>
-                                <TableCell>{order.customer}</TableCell>
-                                <TableCell>{order.date}</TableCell>
+                            <TableRow key={order._id}>
+                                <TableCell>{order.orderId}</TableCell>
+                                <TableCell>{order.customer.name}</TableCell>
+                                <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
                                 <TableCell>₹{order.total.toFixed(2)}</TableCell>
                                 <TableCell>
                                     <Badge className={statusColors[order.status]}>
@@ -189,7 +175,7 @@ export default function OrderManagementPage() {
                                                 <DialogHeader>
                                                     <DialogTitle>Update Order Status</DialogTitle>
                                                     <DialogDescription>
-                                                        Change the status for order {selectedOrder?.id}
+                                                        Change the status for order {selectedOrder?.orderId}
                                                     </DialogDescription>
                                                 </DialogHeader>
                                                 <div className="grid gap-4 py-4">
@@ -199,15 +185,16 @@ export default function OrderManagementPage() {
                                                         </Label>
                                                         <Select
                                                             value={selectedOrder?.status}
-                                                            onValueChange={(value) => handleStatusChange(selectedOrder?.id, value)}
+                                                            onValueChange={(value) => handleStatusChange(selectedOrder?._id, value)}
                                                         >
                                                             <SelectTrigger className="w-[180px]">
                                                                 <SelectValue placeholder="Select status" />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                <SelectItem value="Processing">Processing</SelectItem>
-                                                                <SelectItem value="Shipped">Shipped</SelectItem>
-                                                                <SelectItem value="Delivered">Delivered</SelectItem>
+                                                                <SelectItem value="processing">Processing</SelectItem>
+                                                                <SelectItem value="packed">Packed</SelectItem>
+                                                                <SelectItem value="out for delivery">Out for Delivery</SelectItem>
+                                                                <SelectItem value="delivered">Delivered</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                     </div>
@@ -219,14 +206,33 @@ export default function OrderManagementPage() {
                                         </Dialog>
                                         <Button
                                             variant="outline"
-                                            onClick={() => toggleOrderExpansion(order.id)}
+                                            onClick={() => toggleOrderExpansion(order._id)}
                                         >
-                                            {expandedOrders[order.id] ? <ChevronUp /> : <ChevronDown />}
+                                            {expandedOrders[order._id] ? <ChevronUp /> : <ChevronDown />}
                                         </Button>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline">
+                                                    <MapPin className="mr-2 h-4 w-4" /> Address
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Shipping Address</DialogTitle>
+                                                    <DialogDescription>
+                                                        Address for order {order.orderId}
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="py-4">
+                                                    <p>{order.shippingAddress}</p>
+                                                    <p>Postal Code: {order.postalCode}</p>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
                                 </TableCell>
                             </TableRow>
-                            {expandedOrders[order.id] && (
+                            {expandedOrders[order._id] && (
                                 <TableRow>
                                     <TableCell colSpan={6}>
                                         <div className="bg-gray-50 p-4 rounded-md">
@@ -241,8 +247,8 @@ export default function OrderManagementPage() {
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {order.items.map((item) => (
-                                                        <TableRow key={item.id}>
+                                                    {order.items.map((item, index) => (
+                                                        <TableRow key={index}>
                                                             <TableCell>{item.name}</TableCell>
                                                             <TableCell>₹{item.price.toFixed(2)}</TableCell>
                                                             <TableCell>{item.quantity}</TableCell>
@@ -251,6 +257,24 @@ export default function OrderManagementPage() {
                                                     ))}
                                                 </TableBody>
                                             </Table>
+                                            {order.status !== "delivered" && (
+                                                <div className="mt-4">
+                                                    <h4 className="font-semibold mb-2">Assign Delivery Boy:</h4>
+                                                    <Select
+                                                        onValueChange={(value) => handleAssignDeliveryBoy(order._id, value)}
+                                                        value={order.deliveryBoy?.id || ""}
+                                                    >
+                                                        <SelectTrigger className="w-[200px]">
+                                                            <SelectValue placeholder="Select delivery boy" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {/* Replace with actual delivery boy data */}
+                                                            <SelectItem value="1">John Doe</SelectItem>
+                                                            <SelectItem value="2">Jane Smith</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            )}
                                         </div>
                                     </TableCell>
                                 </TableRow>

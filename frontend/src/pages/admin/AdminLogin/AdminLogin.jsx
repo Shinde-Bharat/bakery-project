@@ -54,7 +54,7 @@ function AdminLogin() {
                     title: "Login Successful",
                     description: "Welcome back!",
                 });
-                navigate('/');
+                navigate('/admin/');
             }
         } catch (error) {
             console.log(error);

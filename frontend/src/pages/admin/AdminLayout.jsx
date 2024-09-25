@@ -1,5 +1,5 @@
 import SideNav from '@/components/utility/SideNav';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
     Package,
@@ -9,6 +9,7 @@ import {
     MessageSquare,
 
 } from "lucide-react"
+import { useEffect, useState } from 'react';
 const navItems = [
     { path: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true }, // exact match for /admin
     { path: '/admin/products', label: 'Product Management', icon: Package },
@@ -20,12 +21,29 @@ const navItems = [
 
 
 const AdminLayout = () => {
+    // Check if admin is already logged in
+    const navigate = useNavigate()
+    const [isAdmin, setIsAdmin] = useState()
+    useEffect(() => {
+        const admin = localStorage.getItem('user');
+        setIsAdmin(admin)
+        if (!admin) {
+            navigate('/admin/login');
+        }
+    }, [navigate]);
     return (
-        <div className="flex h-screen bg-gray-100 font-Montserrat">
-            {/* This will render the child routes dynamically */}
-            <SideNav navItems={navItems} />
-            <Outlet />
-        </div>
+        <> {
+
+            isAdmin &&
+            <div className="flex h-screen bg-gray-100 font-Montserrat">
+                {/* This will render the child routes dynamically */}
+                <SideNav navItems={navItems} />
+                <Outlet />
+            </div>
+        }
+
+        </>
+
     );
 };
 

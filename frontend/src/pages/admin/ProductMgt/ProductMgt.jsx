@@ -272,7 +272,7 @@ export default function ProductMgt() {
                                     </TableCell>
                                     <TableCell>{product.name}</TableCell>
                                     <TableCell>{product.category.name}</TableCell>
-                                    <TableCell>${product.price.toFixed(2)}</TableCell>
+                                    <TableCell>₹{product.price.toFixed(2)}</TableCell>
                                     <TableCell>{product.avlQuantity}</TableCell>
                                     <TableCell>
                                         <div className="flex space-x-2">

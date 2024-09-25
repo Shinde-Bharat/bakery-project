@@ -1,6 +1,6 @@
+"use client"
 
-import { useState } from "react"
-
+import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import {
     Table,
@@ -29,84 +29,112 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-// import { Calendar } from "@/components/ui/calendar"
-import { format } from "date-fns"
-import { Calendar as CalendarIcon, Percent, Tag, Image, Pencil, Trash2, Plus } from "lucide-react"
-import { Button, Input, Textarea } from "@nextui-org/react"
-
-// Mock data for discounts and offers
-const initialDiscounts = [
-    { id: 1, code: "SUMMER20", type: "Percentage", value: 20, expiryDate: "2023-08-31" },
-    { id: 2, code: "FREESHIP", type: "Fixed Amount", value: 10, expiryDate: "2023-07-15" },
-    { id: 3, code: "WELCOME10", type: "Percentage", value: 10, expiryDate: "2023-12-31" },
-]
-
-const initialOffers = [
-    { id: 1, title: "Summer Sale", description: "Get up to 50% off on summer collection", image: "/placeholder.svg", type: "Percentage", value: 50, expiryDate: "2023-08-31" },
-    { id: 2, title: "Back to School", description: "Special discounts on school supplies", image: "/placeholder.svg", type: "Fixed Amount", value: 20, expiryDate: "2023-09-15" },
-]
+import { Percent, Tag, Image, Pencil, Trash2, Plus } from "lucide-react"
+import { Button } from "@nextui-org/button"
+import { Input, Textarea } from "@nextui-org/react"
+import { createCoupon, getAllCoupons, updateCoupon, deleteCoupon } from "@/services/apis/coupons"
+import { createOffer, getAllOffers, updateOffer, deleteOffer } from "@/services/apis/offers"
 
 export default function DiscountCouponsMgt() {
-    const [discounts, setDiscounts] = useState(initialDiscounts)
-    const [offers, setOffers] = useState(initialOffers)
-    const [newDiscount, setNewDiscount] = useState({ code: "", type: "", value: "", expiryDate: "" })
-    const [newOffer, setNewOffer] = useState({ title: "", description: "", image: "", type: "", value: "", expiryDate: "" })
-    const [editingDiscount, setEditingDiscount] = useState(null)
+    const [coupons, setCoupons] = useState([])
+    const [offers, setOffers] = useState([])
+    const [newCoupon, setNewCoupon] = useState({ code: "", type: "percentage", value: "", expiryDate: "" })
+    const [newOffer, setNewOffer] = useState({ title: "", description: "", imgURL: "", type: "percentage", value: "", expiryDate: "" })
+    const [editingCoupon, setEditingCoupon] = useState(null)
     const [editingOffer, setEditingOffer] = useState(null)
 
-    const handleAddDiscount = () => {
-        const discountToAdd = {
-            ...newDiscount,
-            id: discounts.length + 1,
-            value: parseFloat(newDiscount.value),
+    useEffect(() => {
+        fetchCoupons()
+        fetchOffers()
+    }, [])
+
+    const fetchCoupons = async () => {
+        try {
+            const fetchedCoupons = await getAllCoupons()
+            setCoupons(fetchedCoupons)
+        } catch (error) {
+            console.error("Error fetching coupons:", error)
         }
-        setDiscounts([...discounts, discountToAdd])
-        setNewDiscount({ code: "", type: "", value: "", expiryDate: "" })
     }
 
-    const handleEditDiscount = () => {
-        setDiscounts(discounts.map(discount =>
-            discount.id === editingDiscount.id ? editingDiscount : discount
-        ))
-        setEditingDiscount(null)
-    }
-
-    const handleDeleteDiscount = (id) => {
-        setDiscounts(discounts.filter(discount => discount.id !== id))
-    }
-
-    const handleAddOffer = () => {
-        const offerToAdd = {
-            ...newOffer,
-            id: offers.length + 1,
-            value: parseFloat(newOffer.value),
+    const fetchOffers = async () => {
+        try {
+            const fetchedOffers = await getAllOffers()
+            setOffers(fetchedOffers)
+        } catch (error) {
+            console.error("Error fetching offers:", error)
         }
-        setOffers([...offers, offerToAdd])
-        setNewOffer({ title: "", description: "", image: "", type: "", value: "", expiryDate: "" })
     }
 
-    const handleEditOffer = () => {
-        setOffers(offers.map(offer =>
-            offer.id === editingOffer.id ? editingOffer : offer
-        ))
-        setEditingOffer(null)
+    const handleAddCoupon = async () => {
+        try {
+            await createCoupon(newCoupon)
+            fetchCoupons()
+            setNewCoupon({ code: "", type: "percentage", value: "", expiryDate: "" })
+        } catch (error) {
+            console.error("Error adding coupon:", error)
+        }
     }
 
-    const handleDeleteOffer = (id) => {
-        setOffers(offers.filter(offer => offer.id !== id))
+    const handleEditCoupon = async () => {
+        try {
+            await updateCoupon(editingCoupon._id, editingCoupon)
+            fetchCoupons()
+            setEditingCoupon(null)
+        } catch (error) {
+            console.error("Error editing coupon:", error)
+        }
+    }
+
+    const handleDeleteCoupon = async (id) => {
+        try {
+            await deleteCoupon(id)
+            fetchCoupons()
+        } catch (error) {
+            console.error("Error deleting coupon:", error)
+        }
+    }
+
+    const handleAddOffer = async () => {
+        try {
+            await createOffer(newOffer)
+            fetchOffers()
+            setNewOffer({ title: "", description: "", imgURL: "", type: "percentage", value: "", expiryDate: "" })
+        } catch (error) {
+            console.error("Error adding offer:", error)
+        }
+    }
+
+    const handleEditOffer = async () => {
+        try {
+            await updateOffer(editingOffer._id, editingOffer)
+            fetchOffers()
+            setEditingOffer(null)
+        } catch (error) {
+            console.error("Error editing offer:", error)
+        }
+    }
+
+    const handleDeleteOffer = async (id) => {
+        try {
+            await deleteOffer(id)
+            fetchOffers()
+        } catch (error) {
+            console.error("Error deleting offer:", error)
+        }
     }
 
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8">Discounts and Coupons Management</h1>
 
-            <Tabs defaultValue="discounts" className="space-y-4">
+            <Tabs defaultValue="coupons" className="space-y-4">
                 <TabsList>
-                    <TabsTrigger value="discounts">Discount Codes</TabsTrigger>
+                    <TabsTrigger value="coupons">Discount Codes</TabsTrigger>
                     <TabsTrigger value="offers">Promotional Offers</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="discounts">
+                <TabsContent value="coupons">
                     <Card>
                         <CardHeader>
                             <CardTitle>Manage Discount Codes</CardTitle>
@@ -134,8 +162,8 @@ export default function DiscountCouponsMgt() {
                                                 </Label>
                                                 <Input
                                                     id="code"
-                                                    value={newDiscount.code}
-                                                    onChange={(e) => setNewDiscount({ ...newDiscount, code: e.target.value })}
+                                                    value={newCoupon.code}
+                                                    onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value })}
                                                     className="col-span-3"
                                                 />
                                             </div>
@@ -144,15 +172,15 @@ export default function DiscountCouponsMgt() {
                                                     Type
                                                 </Label>
                                                 <Select
-                                                    value={newDiscount.type}
-                                                    onValueChange={(value) => setNewDiscount({ ...newDiscount, type: value })}
+                                                    value={newCoupon.type}
+                                                    onValueChange={(value) => setNewCoupon({ ...newCoupon, type: value })}
                                                 >
                                                     <SelectTrigger className="w-[180px]">
                                                         <SelectValue placeholder="Select type" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="Percentage">Percentage</SelectItem>
-                                                        <SelectItem value="Fixed Amount">Fixed Amount</SelectItem>
+                                                        <SelectItem value="percentage">Percentage</SelectItem>
+                                                        <SelectItem value="flat">Flat</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
@@ -163,8 +191,8 @@ export default function DiscountCouponsMgt() {
                                                 <Input
                                                     id="value"
                                                     type="number"
-                                                    value={newDiscount.value}
-                                                    onChange={(e) => setNewDiscount({ ...newDiscount, value: e.target.value })}
+                                                    value={newCoupon.value}
+                                                    onChange={(e) => setNewCoupon({ ...newCoupon, value: parseFloat(e.target.value) })}
                                                     className="col-span-3"
                                                 />
                                             </div>
@@ -175,14 +203,14 @@ export default function DiscountCouponsMgt() {
                                                 <Input
                                                     id="expiryDate"
                                                     type="date"
-                                                    value={newDiscount.expiryDate}
-                                                    onChange={(e) => setNewDiscount({ ...newDiscount, expiryDate: e.target.value })}
+                                                    value={newCoupon.expiryDate}
+                                                    onChange={(e) => setNewCoupon({ ...newCoupon, expiryDate: e.target.value })}
                                                     className="col-span-3"
                                                 />
                                             </div>
                                         </div>
                                         <DialogFooter>
-                                            <Button type="submit" onClick={handleAddDiscount}>Add Discount</Button>
+                                            <Button type="submit" onClick={handleAddCoupon}>Add Discount</Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
@@ -198,17 +226,17 @@ export default function DiscountCouponsMgt() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {discounts.map((discount) => (
-                                        <TableRow key={discount.id}>
-                                            <TableCell>{discount.code}</TableCell>
-                                            <TableCell>{discount.type}</TableCell>
-                                            <TableCell>{discount.type === "Percentage" ? `${discount.value}%` : `$${discount.value}`}</TableCell>
-                                            <TableCell>{discount.expiryDate}</TableCell>
+                                    {coupons.map((coupon) => (
+                                        <TableRow key={coupon._id}>
+                                            <TableCell>{coupon.code}</TableCell>
+                                            <TableCell>{coupon.type}</TableCell>
+                                            <TableCell>{coupon.type === "percentage" ? `${coupon.value}%` : `₹${coupon.value}`}</TableCell>
+                                            <TableCell>{new Date(coupon.expiryDate).toLocaleDateString()}</TableCell>
                                             <TableCell>
                                                 <div className="flex space-x-2">
                                                     <Dialog>
                                                         <DialogTrigger asChild>
-                                                            <Button variant="outline" onClick={() => setEditingDiscount(discount)}>
+                                                            <Button variant="outline" onClick={() => setEditingCoupon(coupon)}>
                                                                 <Pencil className="mr-2 h-4 w-4" /> Edit
                                                             </Button>
                                                         </DialogTrigger>
@@ -226,8 +254,8 @@ export default function DiscountCouponsMgt() {
                                                                     </Label>
                                                                     <Input
                                                                         id="edit-code"
-                                                                        value={editingDiscount?.code || ""}
-                                                                        onChange={(e) => setEditingDiscount({ ...editingDiscount, code: e.target.value })}
+                                                                        value={editingCoupon?.code || ""}
+                                                                        onChange={(e) => setEditingCoupon({ ...editingCoupon, code: e.target.value })}
                                                                         className="col-span-3"
                                                                     />
                                                                 </div>
@@ -236,15 +264,15 @@ export default function DiscountCouponsMgt() {
                                                                         Type
                                                                     </Label>
                                                                     <Select
-                                                                        value={editingDiscount?.type || ""}
-                                                                        onValueChange={(value) => setEditingDiscount({ ...editingDiscount, type: value })}
+                                                                        value={editingCoupon?.type || ""}
+                                                                        onValueChange={(value) => setEditingCoupon({ ...editingCoupon, type: value })}
                                                                     >
                                                                         <SelectTrigger className="w-[180px]">
                                                                             <SelectValue placeholder="Select type" />
                                                                         </SelectTrigger>
                                                                         <SelectContent>
-                                                                            <SelectItem value="Percentage">Percentage</SelectItem>
-                                                                            <SelectItem value="Fixed Amount">Fixed Amount</SelectItem>
+                                                                            <SelectItem value="percentage">Percentage</SelectItem>
+                                                                            <SelectItem value="flat">Flat</SelectItem>
                                                                         </SelectContent>
                                                                     </Select>
                                                                 </div>
@@ -255,8 +283,8 @@ export default function DiscountCouponsMgt() {
                                                                     <Input
                                                                         id="edit-value"
                                                                         type="number"
-                                                                        value={editingDiscount?.value || ""}
-                                                                        onChange={(e) => setEditingDiscount({ ...editingDiscount, value: parseFloat(e.target.value) })}
+                                                                        value={editingCoupon?.value || ""}
+                                                                        onChange={(e) => setEditingCoupon({ ...editingCoupon, value: parseFloat(e.target.value) })}
                                                                         className="col-span-3"
                                                                     />
                                                                 </div>
@@ -267,18 +295,18 @@ export default function DiscountCouponsMgt() {
                                                                     <Input
                                                                         id="edit-expiryDate"
                                                                         type="date"
-                                                                        value={editingDiscount?.expiryDate || ""}
-                                                                        onChange={(e) => setEditingDiscount({ ...editingDiscount, expiryDate: e.target.value })}
+                                                                        value={editingCoupon?.expiryDate ? new Date(editingCoupon.expiryDate).toISOString().split('T')[0] : ""}
+                                                                        onChange={(e) => setEditingCoupon({ ...editingCoupon, expiryDate: e.target.value })}
                                                                         className="col-span-3"
                                                                     />
                                                                 </div>
                                                             </div>
                                                             <DialogFooter>
-                                                                <Button type="submit" onClick={handleEditDiscount}>Save Changes</Button>
+                                                                <Button type="submit" onClick={handleEditCoupon}>Save Changes</Button>
                                                             </DialogFooter>
                                                         </DialogContent>
                                                     </Dialog>
-                                                    <Button variant="destructive" onClick={() => handleDeleteDiscount(discount.id)}>
+                                                    <Button variant="destructive" onClick={() => handleDeleteCoupon(coupon._id)}>
                                                         <Trash2 className="mr-2 h-4 w-4" /> Delete
                                                     </Button>
                                                 </div>
@@ -313,7 +341,7 @@ export default function DiscountCouponsMgt() {
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="grid gap-4 py-4">
-                                            <div className="grid grid-cols-4 items-center gap-4">
+                                            <div className="grid gri d-cols-4 items-center gap-4">
                                                 <Label htmlFor="title" className="text-right">
                                                     Title
                                                 </Label>
@@ -336,13 +364,13 @@ export default function DiscountCouponsMgt() {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="image" className="text-right">
+                                                <Label htmlFor="imgURL" className="text-right">
                                                     Image URL
                                                 </Label>
                                                 <Input
-                                                    id="image"
-                                                    value={newOffer.image}
-                                                    onChange={(e) => setNewOffer({ ...newOffer, image: e.target.value })}
+                                                    id="imgURL"
+                                                    value={newOffer.imgURL}
+                                                    onChange={(e) => setNewOffer({ ...newOffer, imgURL: e.target.value })}
                                                     className="col-span-3"
                                                 />
                                             </div>
@@ -358,8 +386,8 @@ export default function DiscountCouponsMgt() {
                                                         <SelectValue placeholder="Select type" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="Percentage">Percentage</SelectItem>
-                                                        <SelectItem value="Fixed Amount">Fixed Amount</SelectItem>
+                                                        <SelectItem value="percentage">Percentage</SelectItem>
+                                                        <SelectItem value="flat">Flat</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
@@ -371,7 +399,7 @@ export default function DiscountCouponsMgt() {
                                                     id="offer-value"
                                                     type="number"
                                                     value={newOffer.value}
-                                                    onChange={(e) => setNewOffer({ ...newOffer, value: e.target.value })}
+                                                    onChange={(e) => setNewOffer({ ...newOffer, value: parseFloat(e.target.value) })}
                                                     className="col-span-3"
                                                 />
                                             </div>
@@ -396,18 +424,18 @@ export default function DiscountCouponsMgt() {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {offers.map((offer) => (
-                                    <Card key={offer.id}>
+                                    <Card key={offer._id}>
                                         <CardHeader>
                                             <CardTitle>{offer.title}</CardTitle>
                                             <CardDescription>{offer.description}</CardDescription>
                                         </CardHeader>
                                         <CardContent>
-                                            <img src={offer.image} alt={offer.title} className="w-full h-48 object-cover rounded-md mb-2" />
+                                            <img src={offer.imgURL} alt={offer.title} className="w-full h-48 object-cover rounded-md mb-2" />
                                             <p className="font-semibold">
-                                                Discount: {offer.type === "Percentage" ? `${offer.value}%` : `$${offer.value}`}
+                                                Discount: {offer.type === "percentage" ? `${offer.value}%` : `₹${offer.value}`}
                                             </p>
                                             <p>Type: {offer.type}</p>
-                                            <p>Expires: {offer.expiryDate}</p>
+                                            <p>Expires: {new Date(offer.expiryDate).toLocaleDateString()}</p>
                                         </CardContent>
                                         <CardFooter className="flex justify-between">
                                             <Dialog>
@@ -447,13 +475,13 @@ export default function DiscountCouponsMgt() {
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
-                                                            <Label htmlFor="edit-image" className="text-right">
+                                                            <Label htmlFor="edit-imgURL" className="text-right">
                                                                 Image URL
                                                             </Label>
                                                             <Input
-                                                                id="edit-image"
-                                                                value={editingOffer?.image || ""}
-                                                                onChange={(e) => setEditingOffer({ ...editingOffer, image: e.target.value })}
+                                                                id="edit-imgURL"
+                                                                value={editingOffer?.imgURL || ""}
+                                                                onChange={(e) => setEditingOffer({ ...editingOffer, imgURL: e.target.value })}
                                                                 className="col-span-3"
                                                             />
                                                         </div>
@@ -469,8 +497,8 @@ export default function DiscountCouponsMgt() {
                                                                     <SelectValue placeholder="Select type" />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
-                                                                    <SelectItem value="Percentage">Percentage</SelectItem>
-                                                                    <SelectItem value="Fixed Amount">Fixed Amount</SelectItem>
+                                                                    <SelectItem value="percentage">Percentage</SelectItem>
+                                                                    <SelectItem value="flat">Flat</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
@@ -493,7 +521,7 @@ export default function DiscountCouponsMgt() {
                                                             <Input
                                                                 id="edit-expiryDate"
                                                                 type="date"
-                                                                value={editingOffer?.expiryDate || ""}
+                                                                value={editingOffer?.expiryDate ? new Date(editingOffer.expiryDate).toISOString().split('T')[0] : ""}
                                                                 onChange={(e) => setEditingOffer({ ...editingOffer, expiryDate: e.target.value })}
                                                                 className="col-span-3"
                                                             />
@@ -504,7 +532,7 @@ export default function DiscountCouponsMgt() {
                                                     </DialogFooter>
                                                 </DialogContent>
                                             </Dialog>
-                                            <Button variant="destructive" onClick={() => handleDeleteOffer(offer.id)}>
+                                            <Button variant="destructive" onClick={() => handleDeleteOffer(offer._id)}>
                                                 <Trash2 className="mr-2 h-4 w-4" /> Delete
                                             </Button>
                                         </CardFooter>
