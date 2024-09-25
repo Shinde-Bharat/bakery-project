@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
 
+const categorySchema = new mongoose.Schema({
+    name: String,
+});
+
 const orderItemSchema = new mongoose.Schema({
-    productName: String,
+    name: String,
     price: Number,
     quantity: Number,
-    subtotal: Number
+    category: { categorySchema },
 });
 
 const orderSchema = new mongoose.Schema({
@@ -16,6 +20,7 @@ const orderSchema = new mongoose.Schema({
     shippingAddress: { type: String, required: true },
     postalCode: { type: String, required: true },
     date: { type: Date, default: Date.now },
+
     total: Number,
     status: {
         type: String,

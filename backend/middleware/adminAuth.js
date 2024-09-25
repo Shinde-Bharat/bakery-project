@@ -20,6 +20,8 @@ const adminAuth = (req, res, next) => {
             req.user = user;
             next();
         } catch (error) {
+            console.log(error);
+
             res.status(401).json({ message: 'Admin authentication failed' });
         }
     });

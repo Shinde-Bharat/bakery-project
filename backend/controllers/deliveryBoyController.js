@@ -78,3 +78,71 @@ exports.updateOrderStatus = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+// Admin operations
+exports.getAllDeliveryBoys = async (req, res) => {
+    try {
+        const deliveryBoys = await DeliveryBoy.find().select('-password');
+        res.json(deliveryBoys);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getDeliveryBoyById = async (req, res) => {
+    try {
+        const deliveryBoy = await DeliveryBoy.findById(req.params.id).select('-password');
+        if (!deliveryBoy) return res.status(404).json({ message: 'Delivery boy not found' });
+        res.json(deliveryBoy);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateDeliveryBoy = async (req, res) => {
+    try {
+        const { name, email, phoneNumber } = req.body;
+        const deliveryBoy = await DeliveryBoy.findByIdAndUpdate(
+            req.params.id,
+            { name, email, phoneNumber },
+            { new: true, runValidators: true }
+        ).select('-password');
+        if (!deliveryBoy) return res.status(404).json({ message: 'Delivery boy not found' });
+        res.json(deliveryBoy);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+exports.updateDeliveryBoyPassword = async (req, res) => {
+    try {
+        const { password } = req.body;
+        const deliveryBoy = await DeliveryBoy.findById(req.params.id);
+        if (!deliveryBoy) return res.status(404).json({ message: 'Delivery boy not found' });
+        deliveryBoy.password = password;
+        await deliveryBoy.save();
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+exports.deleteDeliveryBoy = async (req, res) => {
+    try {
+        const deliveryBoy = await DeliveryBoy.findByIdAndDelete(req.params.id);
+        if (!deliveryBoy) return res.status(404).json({ message: 'Delivery boy not found' });
+        res.json({ message: 'Delivery boy deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Delivery boy profile view
+exports.getOwnProfile = async (req, res) => {
+    try {
+        const deliveryBoy = await DeliveryBoy.findById(req.deliveryBoy._id).select('-password');
+        res.json(deliveryBoy);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
