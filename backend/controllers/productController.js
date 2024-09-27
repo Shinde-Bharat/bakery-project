@@ -1,9 +1,25 @@
 // controllers/productController.js
 const Product = require('../models/Product');
+const cloudinary = require('../fileUpload/cloudinaryConfig')
+
 
 exports.createProduct = async (req, res) => {
     try {
-        const product = new Product(req.body);
+        let imageUrl = '';
+        if (req.body.image) {
+            const uploadResponse = await cloudinary.uploader.upload(req.body.image, {
+                folder: '/bakery-imgs'
+            });
+            imageUrl = uploadResponse.secure_url;
+        }
+
+        const product = new Product({
+            name: req.body.name,
+            category: req.body.category,
+            price: req.body.price,
+            avlQuantity: req.body.avlQuantity,
+            imageURL: imageUrl
+        });
         await product.save();
         res.status(201).json(product);
     } catch (error) {

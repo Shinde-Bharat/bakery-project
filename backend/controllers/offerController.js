@@ -1,10 +1,29 @@
 
-// controllers/offerController.js
 const Offer = require('../models/Offer');
+const cloudinary = require('../fileUpload/cloudinaryConfig')
+
 
 exports.createOffer = async (req, res) => {
     try {
-        const offer = new Offer(req.body);
+
+
+        let imageUrl = '';
+        if (req.body.imgURL) {
+            const uploadResponse = await cloudinary.uploader.upload(req.body.imgURL, {
+                folder: '/bakery-imgs'
+            });
+            imageUrl = uploadResponse.secure_url;
+        }
+
+        const offer = new Offer({
+            title: req.body.title,
+            description: req.body.description,
+            imgURL: imageUrl,
+            type: req.body.type,
+            value: req.body.value,
+            expiryDate: req.body.expiryDate,
+        })
+
         await offer.save();
         res.status(201).json(offer);
     } catch (error) {
