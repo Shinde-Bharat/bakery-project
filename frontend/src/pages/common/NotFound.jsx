@@ -12,12 +12,12 @@ export default function NotFound() {
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
                     <Button asChild>
-                        <NavLink href="/">
+                        <NavLink to="/">
                             Return to Home
                         </NavLink>
                     </Button>
                     <Button variant="outline" asChild>
-                        <NavLink href="/products">
+                        <NavLink to="/products">
                             View Our products
                         </NavLink>
                     </Button>

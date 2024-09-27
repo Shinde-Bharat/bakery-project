@@ -29,7 +29,7 @@ export default function ProductCard({ product, onAddToCart, onRemoveFromFavorite
                     onClick={() => { navigate(`/product/${product._id}`) }}
                     isZoomed
                     className="object-cover rounded-xl cursor-pointer aspect-square"
-                    src={cake}
+                    src={product.imageURL}
                     // src={"https://nextui.org/images/fruit-2.jpeg"}
                     width={240}
                 />

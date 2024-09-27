@@ -1,33 +1,48 @@
+
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { CheckCircle2, Package, Truck } from "lucide-react"
-
-// Mock order data
-const orderData = {
-  orderId: "ORD-12345-ABCDE",
-  date: "May 15, 2023",
-  status: "Processing",
-  items: [
-    { id: 1, name: "Wireless Earbuds", quantity: 1, price: 79.99 },
-    { id: 2, name: "Smart Watch", quantity: 1, price: 199.99 },
-    { id: 3, name: "Portable Charger", quantity: 2, price: 49.99 },
-  ],
-  subtotal: 379.96,
-  shipping: 9.99,
-  tax: 37.99,
-  total: 427.94,
-  shippingAddress: {
-    name: "John Doe",
-    street: "123 Main St",
-    city: "Anytown",
-    state: "CA",
-    zipCode: "12345",
-    country: "United States",
-  },
-  paymentMethod: "RazorPay",
-}
+import { getOrderByOrderId } from '@/services/apis/order'
+import { toast } from '@/hooks/use-toast'
+import { useUser } from '@/hooks/reduxHooks'
 
 export default function OrderConfirmedPage() {
+  const { orderId } = useParams()
+  const [orderData, setOrderData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const { user } = useUser()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const order = await getOrderByOrderId(orderId)
+        setOrderData(order)
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch order details. Please try again.",
+          variant: "destructive",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (!user.isLoggedIn) navigate('/login')
+    fetchOrder()
+  }, [orderId])
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (!orderData) {
+    return <div>Order not found</div>
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
@@ -48,7 +63,7 @@ export default function OrderConfirmedPage() {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span>Order Date:</span>
-                <span>{orderData.date}</span>
+                <span>{new Date(orderData.date).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between">
                 <span>Order Status:</span>
@@ -57,8 +72,8 @@ export default function OrderConfirmedPage() {
               <Separator />
               <div>
                 <h3 className="font-semibold mb-2">Items</h3>
-                {orderData.items.map((item) => (
-                  <div key={item.id} className="flex justify-between mb-2">
+                {orderData.items.map((item, index) => (
+                  <div key={index} className="flex justify-between mb-2">
                     <span>
                       {item.name} x {item.quantity}
                     </span>
@@ -70,15 +85,7 @@ export default function OrderConfirmedPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span>₹{orderData.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping:</span>
-                  <span>₹{orderData.shipping.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax:</span>
-                  <span>₹{orderData.tax.toFixed(2)}</span>
+                  <span>₹{orderData.total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-semibold">
                   <span>Total:</span>
@@ -99,13 +106,9 @@ export default function OrderConfirmedPage() {
             </CardHeader>
             <CardContent>
               <address className="not-italic">
-                <p>{orderData.shippingAddress.name}</p>
-                <p>{orderData.shippingAddress.street}</p>
-                <p>
-                  {orderData.shippingAddress.city}, {orderData.shippingAddress.state}{" "}
-                  {orderData.shippingAddress.zipCode}
-                </p>
-                <p>{orderData.shippingAddress.country}</p>
+                <p>{orderData.customer.name}</p>
+                <p>{orderData.shippingAddress}</p>
+                <p>{orderData.postalCode}</p>
               </address>
             </CardContent>
           </Card>
@@ -114,16 +117,18 @@ export default function OrderConfirmedPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Package className="w-5 h-5 mr-2" />
-                Payment Method
+                Order Details
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p>{orderData.paymentMethod}</p>
+              <p>Order ID: {orderData.orderId}</p>
+              <p>Customer Phone: {orderData.customer.number}</p>
+              {orderData.deliveryBoy && (
+                <p>Delivery Boy: {orderData.deliveryBoy.name}</p>
+              )}
             </CardContent>
           </Card>
         </div>
-
-
       </div>
     </div>
   )

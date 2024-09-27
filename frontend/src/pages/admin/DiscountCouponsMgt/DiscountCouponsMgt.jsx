@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
@@ -126,33 +126,33 @@ export default function DiscountCouponsMgt() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8">Discounts and Coupons Management</h1>
+            <h1 className="text-3xl font-bold mb-8">Offers and Coupons Management</h1>
 
             <Tabs defaultValue="coupons" className="space-y-4">
                 <TabsList>
-                    <TabsTrigger value="coupons">Discount Codes</TabsTrigger>
+                    <TabsTrigger value="coupons">Coupons Codes</TabsTrigger>
                     <TabsTrigger value="offers">Promotional Offers</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="coupons">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Manage Discount Codes</CardTitle>
-                            <CardDescription>Create and manage discount codes for your store</CardDescription>
+                            <CardTitle>Manage Coupons Codes</CardTitle>
+                            <CardDescription>Create and manage Coupons codes for your store</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="mb-4">
                                 <Dialog>
                                     <DialogTrigger asChild>
                                         <Button>
-                                            <Plus className="mr-2 h-4 w-4" /> Add New Discount
+                                            <Plus className="mr-2 h-4 w-4" /> Add New Coupons code
                                         </Button>
                                     </DialogTrigger>
                                     <DialogContent className="sm:max-w-[425px]">
                                         <DialogHeader>
-                                            <DialogTitle>Add New Discount</DialogTitle>
+                                            <DialogTitle>Add New Coupons code</DialogTitle>
                                             <DialogDescription>
-                                                Create a new discount code for your customers.
+                                                Create a new Coupons code for your customers.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="grid gap-4 py-4">

@@ -55,6 +55,23 @@ export const getOrder = async (id) => {
     }
 };
 
+export const getOrderByOrderId = async (orderId) => {
+    try {
+        const { token, refreshToken } = getTokens();
+        const response = await axios.get(`${API_URL}/api/orders/by-order-id/${orderId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "x-refresh-token": refreshToken,
+            },
+        });
+        replaceJWTIfRefreshed(response);
+        return response.data;
+    } catch (error) {
+        console.error("Fetching order by orderId failed:", error);
+        throw error;
+    }
+};
+
 export const updateOrderStatusAdmin = async (id, status) => {
     try {
         const { token, refreshToken } = getTokens();

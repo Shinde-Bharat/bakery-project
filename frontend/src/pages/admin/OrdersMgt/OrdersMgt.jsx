@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
@@ -257,22 +257,17 @@ export default function OrderManagementPage() {
                                                     ))}
                                                 </TableBody>
                                             </Table>
-                                            {order.status !== "delivered" && (
+                                            {order.status === "out for delivery" && (
                                                 <div className="mt-4">
-                                                    <h4 className="font-semibold mb-2">Assign Delivery Boy:</h4>
-                                                    <Select
-                                                        onValueChange={(value) => handleAssignDeliveryBoy(order._id, value)}
-                                                        value={order.deliveryBoy?.id || ""}
-                                                    >
-                                                        <SelectTrigger className="w-[200px]">
-                                                            <SelectValue placeholder="Select delivery boy" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {/* Replace with actual delivery boy data */}
-                                                            <SelectItem value="1">John Doe</SelectItem>
-                                                            <SelectItem value="2">Jane Smith</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <h4 className="font-semibold mb-2"> Delivery Boy:</h4>
+                                                    {order?.deliveryBoy?.name}
+                                                </div>
+                                            )}
+                                            {order.status === "delivered" && (
+                                                <div className="mt-4">
+                                                    <h4 className="font-semibold mb-2"> Delivered by:</h4>
+                                                    {order.deliveryBoy === 'undefined' ? 'Admin' : order?.deliveryBoy?.name}
+
                                                 </div>
                                             )}
                                         </div>

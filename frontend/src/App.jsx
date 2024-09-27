@@ -27,6 +27,7 @@ import Login from './pages/user/LoginRegister/Login';
 import AdminLogin from './pages/admin/AdminLogin/AdminLogin';
 import DeliveryLogin from './pages/delivery/DeliveryLogin/DeliveryLogin';
 import LandingPage from './pages/user/Landing/LandingPage';
+import NotFound from './pages/common/NotFound';
 
 // color-amber
 
@@ -46,7 +47,7 @@ const App = () => {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/confirmedOrdered/:id" element={<OrderConfirmedPage />} />
+            <Route path="/confirmedOrdered/:orderId" element={<OrderConfirmedPage />} />
             <Route path="/track" element={<TrackOrderPage />} />
           </Route>
 
@@ -69,6 +70,9 @@ const App = () => {
             <Route path="/delivery/profile" element={<DeliveryProfile />} />
           </Route>
           <Route path="/delivery/login" element={<DeliveryLogin />} />
+
+
+          <Route path="*" element={<NotFound />} />
 
 
         </Routes>

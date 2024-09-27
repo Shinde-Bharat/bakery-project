@@ -15,7 +15,7 @@ const navItems = [
     { path: '/admin/products', label: 'Product Management', icon: Package },
     { path: '/admin/orders', label: 'Order Management', icon: ShoppingCart },
     { path: '/admin/users', label: 'User Management', icon: Users },
-    { path: '/admin/discounts', label: 'Discounts and Coupons', icon: Tag },
+    { path: '/admin/discounts', label: 'Coupons and Offers', icon: Tag },
     { path: '/admin/reviews_messages', label: 'Reviews and Messages', icon: MessageSquare },
 ];
 

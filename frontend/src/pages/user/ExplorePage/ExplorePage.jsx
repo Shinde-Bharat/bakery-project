@@ -1,5 +1,5 @@
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
     Select,
     SelectContent,
@@ -7,25 +7,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { CheckboxGroup, Checkbox } from "@nextui-org/react";
-import { Slider } from "@nextui-org/react";
+import { CheckboxGroup, Checkbox } from "@nextui-org/react"
+import { Slider } from "@nextui-org/react"
 import { Filter, Search, StarIcon } from "lucide-react"
 import { Input } from "@nextui-org/react"
-import ProductCard from "@/components/utility/ProductCard";
-
-// Mock data for demonstration
-const categories = ["Cakes", "Pastries", "Cupcakes", "Breads"];
-
-const products = [
-    { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8, category: "Cakes" },
-    { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6, category: "Cakes" },
-    { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7, category: "Pastries" },
-    { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5, category: "Pastries" },
-    { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9, category: "Cupcakes" },
-    { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3, category: "Breads" }
-];
-
-
+import ProductCard from "@/components/utility/ProductCard"
+import { getAllProducts } from "@/services/apis/products"
+import { getAllCategories } from "@/services/apis/categories"
+import { toast } from "@/hooks/use-toast"
 
 export default function ExplorePage() {
     const [searchTerm, setSearchTerm] = useState("")
@@ -33,10 +22,40 @@ export default function ExplorePage() {
     const [priceRange, setPriceRange] = useState([0, 1000])
     const [minRating, setMinRating] = useState(0)
     const [sortBy, setSortBy] = useState("popularity")
+    const [products, setProducts] = useState([])
+    const [categories, setCategories] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        fetchProductsAndCategories()
+    }, [])
+
+    const fetchProductsAndCategories = async () => {
+        try {
+            const [productsData, categoriesData] = await Promise.all([
+                getAllProducts(),
+                getAllCategories()
+            ])
+            setProducts(productsData)
+            setCategories(categoriesData)
+            let maxPrice = Math.max(...productsData.map(p => p.price))
+            maxPrice = maxPrice + 50
+            setPriceRange([0, maxPrice])
+        } catch (error) {
+            console.error("Error fetching data:", error)
+            toast({
+                title: "Error",
+                description: "Failed to fetch products and categories. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const filteredProducts = products.filter((product) => {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category)
+        const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category._id)
         const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1]
         const matchesRating = product.rating >= minRating
         return matchesSearch && matchesCategory && matchesPrice && matchesRating
@@ -55,9 +74,12 @@ export default function ExplorePage() {
         }
     })
 
-    return (
-        <div className=" px-24 py-8 font-Manrope">
+    if (loading) {
+        return <div className="flex justify-center items-center h-screen">Loading...</div>
+    }
 
+    return (
+        <div className="px-24 py-8 font-Manrope">
             <Input
                 isClearable
                 placeholder="Search Something..."
@@ -67,6 +89,8 @@ export default function ExplorePage() {
                 startContent={
                     <Search className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                 }
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-[0.7fr_1fr_1fr_1fr] gap-8 font-Manrope pt-8">
@@ -74,23 +98,21 @@ export default function ExplorePage() {
                 <div className="space-y-6 ">
                     <div>
                         <h2 className="text-xl font-semibold mb-2">Categories</h2>
-
                         {categories.map((category) => (
-                            <div key={category} className="flex items-center space-x-2">
+                            <div key={category._id} className="flex items-center space-x-2">
                                 <Checkbox
-                                    id={category}
-                                    isSelected={selectedCategories.includes(category)}
+                                    id={category._id}
+                                    isSelected={selectedCategories.includes(category._id)}
                                     onValueChange={(checked) => {
                                         setSelectedCategories(
                                             checked
-                                                ? [...selectedCategories, category]
-                                                : selectedCategories.filter((c) => c !== category)
+                                                ? [...selectedCategories, category._id]
+                                                : selectedCategories.filter((c) => c !== category._id)
                                         )
                                     }}
                                 >
-                                    {category}
+                                    {category.name}
                                 </Checkbox>
-
                             </div>
                         ))}
                     </div>
@@ -101,13 +123,12 @@ export default function ExplorePage() {
                             label="Select a budget"
                             formatOptions={{ style: "currency", currency: "INR" }}
                             step={10}
-                            maxValue={1000}
-                            minValue={0}
+                            maxValue={500}
+                            minValue={10}
                             value={priceRange}
                             onChange={setPriceRange}
                             className="mb-2"
                         />
-
                         <div className="flex justify-between">
                             <span>₹{priceRange[0]}</span>
                             <span>₹{priceRange[1]}</span>
@@ -149,16 +170,13 @@ export default function ExplorePage() {
                                 </SelectContent>
                             </Select>
                         </div>
-
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {sortedProducts.map((product) => (
                             <ProductCard
-                                key={product.id}
+                                key={product._id}
                                 product={product}
-                                onAddToCart={() => addToCart(product.id)}
-                                onRemoveFromFavorites={() => removeFromFavorites(product.id)}
 
                             />
                         ))}

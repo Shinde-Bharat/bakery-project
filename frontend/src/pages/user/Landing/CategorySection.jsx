@@ -35,35 +35,6 @@ function CategorySection() {
     }, []);
     // console.log(categories);
 
-    // const categories = [
-    //     {
-    //         id: 1,
-    //         categoryName: "Cake",
-    //         image: cupcake, // Replace with actual image URL
-    //     },
-    //     {
-    //         id: 2,
-    //         categoryName: "Croinssant",
-    //         image: croinssant, // Replace with actual image URL
-    //     },
-    //     {
-    //         id: 3,
-    //         categoryName: "Bun",
-    //         image: bun, // Replace with actual image URL
-    //     },
-    //     {
-    //         id: 4,
-    //         categoryName: "Bagutte",
-    //         image: bagutte, // Replace with actual image URL
-    //     },
-    //     {
-    //         id: 5,
-    //         categoryName: "Donut",
-    //         image: donut, // Replace with actual image URL
-    //     }
-    // ];
-
-
 
     // Function to handle category selection
     const handleCategoryClick = (categoryName) => {

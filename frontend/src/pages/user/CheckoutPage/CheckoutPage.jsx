@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@nextui-org/button"
 import { Input, Radio, RadioGroup, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react"
 import { useNavigate } from "react-router-dom"
-import { useOrderSummary } from "@/hooks/reduxHooks"
+import { useOrderSummary, useUser } from "@/hooks/reduxHooks"
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -35,6 +35,7 @@ export default function CheckoutPage() {
     const [selectedAddress, setSelectedAddress] = useState(savedAddresses[0].name)
     const [order, setOrder] = useState(null)
     const [orderId, setOrderId] = useState(null)
+    const { user } = useUser()
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(checkoutSchema),
@@ -50,6 +51,7 @@ export default function CheckoutPage() {
     })
 
     useEffect(() => {
+        if (!user.isLoggedIn) navigate('/login')
         if (orderSummary.total === 0) {
             navigate('/cart')
         }

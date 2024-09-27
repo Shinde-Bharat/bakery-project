@@ -1,54 +1,55 @@
-import { useState } from "react"
+
+import { useState, useEffect } from "react"
 import { Minus, Plus, Trash2 } from "lucide-react"
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Button, Input, Image } from "@nextui-org/react";
-import { useNavigate } from "react-router-dom";
-import { useCart, useOrderSummary } from "@/hooks/reduxHooks";
-import { toast } from "@/hooks/use-toast";
-
-
-// Mock data for cart items
-const initialCartItems = [
-    { id: 1, name: "Wireless Earbuds", price: 79.99, quantity: 1, image: "https://g-l--q8r-vryke.vusercontent.net/placeholder.svg" },
-    { id: 2, name: "Smart Watch", price: 199.99, quantity: 1, image: "https://g-l--q8r-vryke.vusercontent.net/placeholder.svg" },
-    { id: 3, name: "Portable Charger", price: 49.99, quantity: 2, image: "https://g-l--q8r-vryke.vusercontent.net/placeholder.svg" },
-]
-
-const ongoingOffer = {
-    type: "percentage",
-    value: 10,
-    description: "10% off on all items"
-}
-
-const validCoupons = [
-    { code: "SAVE20", type: "percentage", value: 20 },
-    { code: "FLAT10OFF", type: "flat", value: 10 },
-]
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Button, Input, Image } from "@nextui-org/react"
+import { useNavigate } from "react-router-dom"
+import { useCart, useOrderSummary } from "@/hooks/reduxHooks"
+import { toast } from "@/hooks/use-toast"
+import { getAllOffers } from "@/services/apis/offers"
+import { getAllCoupons } from "@/services/apis/coupons"
 
 export default function CartPage() {
     const [couponCode, setCouponCode] = useState("")
     const [appliedCoupon, setAppliedCoupon] = useState(null)
-    const [cartItems, setCartItems] = useState(initialCartItems)
+    const [offers, setOffers] = useState([])
+    const [coupons, setCoupons] = useState([])
     const { cart, removeItem, updateItemQuantity } = useCart()
     const { setOrderSummary } = useOrderSummary()
-
-
-
-
-    // console.log(cart);
-
     const navigate = useNavigate()
 
+    useEffect(() => {
+        fetchOffersAndCoupons()
+    }, [])
+
+    const fetchOffersAndCoupons = async () => {
+        try {
+            const [offersData, couponsData] = await Promise.all([
+                getAllOffers(),
+                getAllCoupons()
+            ])
+            setOffers(offersData)
+            setCoupons(couponsData)
+        } catch (error) {
+            console.error("Error fetching offers and coupons:", error)
+            toast({
+                title: "Error",
+                description: "Failed to fetch offers and coupons. Please try again.",
+                variant: "destructive",
+            })
+        }
+    }
+
     const handleQuantityChange = (itemId, newQuantity) => {
-        const item = cart.items.find(item => item._id === itemId);
-        if (!item) return;
+        const item = cart.items.find(item => item._id === itemId)
+        if (!item) return
 
         if (newQuantity < 1) {
             toast({
                 title: "Minimum quantity reached",
                 description: "Quantity cannot be less than 1.",
                 variant: "warning",
-            });
-            return;
+            })
+            return
         }
 
         if (newQuantity > item.avlQuantity) {
@@ -56,24 +57,27 @@ export default function CartPage() {
                 title: "Maximum quantity reached",
                 description: `Only ${item.avlQuantity} items available in stock.`,
                 variant: "warning",
-            });
-            return;
+            })
+            return
         }
 
-        updateItemQuantity(itemId, newQuantity);
+        updateItemQuantity(itemId, newQuantity)
     }
 
     const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const tax = subtotal * 0.1 // Assuming 10% tax
 
     // Apply ongoing offer
-    const ongoingOfferDiscount = ongoingOffer.type === "percentage"
-        ? subtotal * (ongoingOffer.value / 100)
-        : ongoingOffer.value
+    const ongoingOffer = offers.find(offer => new Date(offer.expiryDate) > new Date())
+    const ongoingOfferDiscount = ongoingOffer
+        ? ongoingOffer.type === "percentage"
+            ? subtotal * (ongoingOffer.value / 100)
+            : ongoingOffer.value
+        : 0
 
     // Apply coupon discount
     const applyCoupon = () => {
-        const coupon = validCoupons.find(c => c.code === couponCode)
+        const coupon = coupons.find(c => c.code === couponCode && new Date(c.expiryDate) > new Date())
         if (coupon) {
             setAppliedCoupon(coupon)
             setCouponCode("")
@@ -81,13 +85,13 @@ export default function CartPage() {
                 title: "Coupon applied",
                 description: `${coupon.code} coupon has been applied successfully.`,
                 variant: "success",
-            });
+            })
         } else {
             toast({
                 title: "Invalid coupon",
-                description: "The entered coupon code is invalid.",
+                description: "The entered coupon code is invalid or expired.",
                 variant: "error",
-            });
+            })
         }
     }
 
@@ -104,16 +108,18 @@ export default function CartPage() {
             items: cart.items,
             subtotal: subtotal,
             tax: tax,
+            ongoingOfferDiscount: ongoingOfferDiscount,
+            couponDiscount: couponDiscount,
             total: total,
-        };
+        }
 
-        setOrderSummary(orderSummary);
+        setOrderSummary(orderSummary)
         navigate('/checkout')
     }
 
     return (
         <div className="px-24 py-8 font-Montserrat">
-            <h1 className="text-3xl font-bold mb-8">Your Cart {cart.items.length}</h1>
+            <h1 className="text-3xl font-bold mb-8">Your Cart ({cart.items.length})</h1>
             {cart.items.length === 0 ? (
                 <p className="text-xl text-center">Your cart is empty.</p>
             ) : (
@@ -122,8 +128,8 @@ export default function CartPage() {
                         <Table>
                             <TableHeader>
                                 <TableColumn className="w-[100px] uppercase">Product</TableColumn>
-                                <TableColumn className=" uppercase">Name</TableColumn>
-                                <TableColumn className=" uppercase">Quantity</TableColumn>
+                                <TableColumn className="uppercase">Name</TableColumn>
+                                <TableColumn className="uppercase">Quantity</TableColumn>
                                 <TableColumn className="text-right uppercase">Price</TableColumn>
                                 <TableColumn className="text-right uppercase">Total</TableColumn>
                                 <TableColumn className="text-right uppercase">Action</TableColumn>
@@ -165,7 +171,7 @@ export default function CartPage() {
                                         <TableCell className="text-right">₹{item.price.toFixed(2)}</TableCell>
                                         <TableCell className="text-right">₹{(item.price * item.quantity).toFixed(2)}</TableCell>
                                         <TableCell>
-                                            <Button variant="light" size="icon" onClick={() => removeItem(item.id)}>
+                                            <Button variant="light" size="icon" onClick={() => removeItem(item._id)}>
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </TableCell>
