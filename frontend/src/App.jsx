@@ -28,7 +28,7 @@ import AdminLogin from './pages/admin/AdminLogin/AdminLogin';
 import DeliveryLogin from './pages/delivery/DeliveryLogin/DeliveryLogin';
 import LandingPage from './pages/user/Landing/LandingPage';
 import NotFound from './pages/common/NotFound';
-import ContactPage from './pages/user/Landing/Contact';
+import ContactPage from './pages/user/Landing/ContactPage';
 
 // color-amber
 
@@ -63,7 +63,7 @@ const App = () => {
             <Route path="/admin/orders" element={<OrderMgt />} />
             <Route path="/admin/users" element={<UserMgt />} />
             <Route path="/admin/discounts" element={<DiscountCouponsMgt />} />
-            <Route path="/admin/reviews_messages" element={<MessageReviewsMgt />} />
+            <Route path="/admin/messages" element={<MessageReviewsMgt />} />
           </Route>
           <Route path="/admin/login" element={<AdminLogin />} />
 

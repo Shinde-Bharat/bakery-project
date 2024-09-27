@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -8,6 +7,7 @@ import { toast } from "@/hooks/use-toast"
 import { MapPin, Phone, Mail, Clock } from "lucide-react"
 import { Button, Card, CardBody, CardHeader, Input, Textarea } from "@nextui-org/react"
 import SectionHeading from "@/components/utility/SectionHeading"
+import { createMessage } from "@/services/apis/message"
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -16,8 +16,8 @@ const formSchema = z.object({
     email: z.string().email({
         message: "Please enter a valid email address.",
     }),
-    subject: z.string().min(0, {
-        message: "Subject must be at least 0 characters.",
+    subject: z.string().min(2, {
+        message: "Subject must be at least 2 characters.",
     }),
     message: z.string().min(10, {
         message: "Message must be at least 10 characters.",
@@ -40,22 +40,14 @@ export default function ContactPage() {
     async function onSubmit(values) {
         setIsSubmitting(true)
         try {
-            const response = await fetch("/api/contact", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-            })
+            const response = await createMessage(values)
 
-            if (response.ok) {
+            if (response) {
                 toast({
                     title: "Message sent!",
                     description: "We'll get back to you as soon as possible.",
                 })
-                form.reset()
-            } else {
-                throw new Error("Failed to send message")
+                contactform.reset()
             }
         } catch (error) {
             toast({
@@ -111,7 +103,6 @@ export default function ContactPage() {
             </div>
 
             <div className="  px-24">
-
                 <div className="grid grid-cols-[1.1fr_1.2fr] space-x-4">
                     <Card className="max-w-full h-fit p-4 ">
                         <CardHeader className="font-semibold text-2xl">Send us a message</CardHeader>
@@ -134,7 +125,6 @@ export default function ContactPage() {
                                     {...contactform.register("email")}
                                 />
                                 <Input
-
                                     label="subject"
                                     isInvalid={!!contactform.formState.errors.subject}
                                     errorMessage={contactform.formState.errors.subject?.message}
@@ -159,7 +149,6 @@ export default function ContactPage() {
                         Want to place a custom order,<br /> or just want to say hello?
                     </div>
                 </div>
-
             </div>
         </div>
     )
