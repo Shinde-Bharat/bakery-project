@@ -15,32 +15,6 @@ export default function NavBar() {
 
 
 
-    // useEffect(() => {
-
-    //     const user = JSON.parse(localStorage.getItem('user'));
-    //     if (user?.token) {
-    //         const fetchUserData = async () => {
-    //             // Fetch the full user profile
-    //             const userProfile = await getUserProfile();
-
-    //             //making new object for the redux
-    //             const userInfo = {
-    //                 id: userProfile?._id,
-    //                 name: userProfile?.name,
-    //                 email: userProfile?.email,
-    //                 isLoggedIn: true,
-    //             };
-
-
-    //             // Update Redux store with the full user profile
-    //             updateUserInfo(userInfo);
-    //         }
-    //         fetchUserData()
-
-    //     }
-    // }, [])
-
-
     const navigate = useNavigate()
     const navItems = [
         { name: "Home", path: "/" },
@@ -58,7 +32,7 @@ export default function NavBar() {
     ];
     // shouldHideOnScroll isBordered
     return (
-        <Navbar shouldHideOnScroll isBordered onMenuOpenChange={setIsMenuOpen}>
+        <Navbar className="font-Montserrat" shouldHideOnScroll isBordered onMenuOpenChange={setIsMenuOpen}>
             <NavbarContent>
                 <NavbarMenuToggle
                     aria-label={isMenuOpen ? "Close menu" : "Open menu"}

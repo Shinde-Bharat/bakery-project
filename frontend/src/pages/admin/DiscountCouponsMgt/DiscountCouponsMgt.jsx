@@ -39,7 +39,7 @@ export default function DiscountCouponsMgt() {
     const [coupons, setCoupons] = useState([])
     const [offers, setOffers] = useState([])
     const [newCoupon, setNewCoupon] = useState({ code: "", type: "percentage", value: "", expiryDate: "" })
-    const [newOffer, setNewOffer] = useState({ title: "", description: "", imgURL: "", type: "percentage", value: "", expiryDate: "" })
+    const [newOffer, setNewOffer] = useState({ title: "", description: "", imgURL: null, type: "percentage", value: "", expiryDate: "" })
     const [editingCoupon, setEditingCoupon] = useState(null)
     const [editingOffer, setEditingOffer] = useState(null)
 
@@ -95,11 +95,23 @@ export default function DiscountCouponsMgt() {
         }
     }
 
+    // for file upload
+    const handleFileChange = (e, setter) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setter(prevState => ({ ...prevState, imgURL: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleAddOffer = async () => {
         try {
             await createOffer(newOffer)
             fetchOffers()
-            setNewOffer({ title: "", description: "", imgURL: "", type: "percentage", value: "", expiryDate: "" })
+            setNewOffer({ title: "", description: "", imgURL: null, type: "percentage", value: "", expiryDate: "" })
         } catch (error) {
             console.error("Error adding offer:", error)
         }
@@ -123,6 +135,7 @@ export default function DiscountCouponsMgt() {
             console.error("Error deleting offer:", error)
         }
     }
+
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -368,11 +381,15 @@ export default function DiscountCouponsMgt() {
                                                     Image URL
                                                 </Label>
                                                 <Input
+                                                    type="file"
+                                                    className="col-span-3" onChange={(e) => handleFileChange(e, setNewOffer)}
+                                                />
+                                                {/* <Input
                                                     id="imgURL"
                                                     value={newOffer.imgURL}
                                                     onChange={(e) => setNewOffer({ ...newOffer, imgURL: e.target.value })}
                                                     className="col-span-3"
-                                                />
+                                                /> */}
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
                                                 <Label htmlFor="offer-type" className="text-right">

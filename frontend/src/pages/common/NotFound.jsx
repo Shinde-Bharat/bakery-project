@@ -17,7 +17,7 @@ export default function NotFound() {
                         </NavLink>
                     </Button>
                     <Button variant="outline" asChild>
-                        <NavLink to="/products">
+                        <NavLink to="/explore">
                             View Our products
                         </NavLink>
                     </Button>

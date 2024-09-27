@@ -1,4 +1,4 @@
-
+"use client"
 
 import { useEffect, useState } from "react"
 import { Label } from "@/components/ui/label"
@@ -46,11 +46,11 @@ export default function ProductMgt() {
         category: "",
         price: "",
         avlQuantity: "",
-        imageURL: "",
+        image: null,
     })
     const [newCategory, setNewCategory] = useState({
         name: "",
-        imgURL: "",
+        image: null,
     })
 
     useEffect(() => {
@@ -74,16 +74,22 @@ export default function ProductMgt() {
         return matchesSearch && matchesCategory
     })
 
+    const handleFileChange = (e, setter) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setter(prevState => ({ ...prevState, image: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleAddProduct = async () => {
         try {
-            const productData = {
-                ...newProduct,
-                price: parseFloat(newProduct.price),
-                avlQuantity: parseInt(newProduct.avlQuantity),
-            }
-            await createProduct(productData)
+            await createProduct(newProduct)
             fetchData()
-            setNewProduct({ name: "", category: "", price: "", avlQuantity: "", imageURL: "" })
+            setNewProduct({ name: "", category: "", price: "", avlQuantity: "", image: null })
         } catch (error) {
             console.error("Error adding product:", error)
         }
@@ -91,12 +97,7 @@ export default function ProductMgt() {
 
     const handleEditProduct = async () => {
         try {
-            const productData = {
-                ...editingProduct,
-                price: parseFloat(editingProduct.price),
-                avlQuantity: parseInt(editingProduct.avlQuantity),
-            }
-            await updateProduct(editingProduct._id, productData)
+            await updateProduct(editingProduct._id, editingProduct)
             fetchData()
             setEditingProduct(null)
         } catch (error) {
@@ -117,7 +118,7 @@ export default function ProductMgt() {
         try {
             await createCategory(newCategory)
             fetchData()
-            setNewCategory({ name: "", imgURL: "" })
+            setNewCategory({ name: "", image: null })
         } catch (error) {
             console.error("Error adding category:", error)
         }
@@ -234,13 +235,13 @@ export default function ProductMgt() {
                                             />
                                         </div>
                                         <div className="grid grid-cols-4 items-center gap-4">
-                                            <Label htmlFor="imageURL" className="text-right">
-                                                Image URL
+                                            <Label htmlFor="image" className="text-right">
+                                                Image
                                             </Label>
                                             <Input
-                                                id="imageURL"
-                                                value={newProduct.imageURL}
-                                                onChange={(e) => setNewProduct({ ...newProduct, imageURL: e.target.value })}
+                                                id="image"
+                                                type="file"
+                                                onChange={(e) => handleFileChange(e, setNewProduct)}
                                                 className="col-span-3"
                                             />
                                         </div>
@@ -345,12 +346,12 @@ export default function ProductMgt() {
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
                                                             <Label htmlFor="edit-image" className="text-right">
-                                                                Image URL
+                                                                Image
                                                             </Label>
                                                             <Input
                                                                 id="edit-image"
-                                                                value={editingProduct?.imageURL || ""}
-                                                                onChange={(e) => setEditingProduct({ ...editingProduct, imageURL: e.target.value })}
+                                                                type="file"
+                                                                onChange={(e) => handleFileChange(e, setEditingProduct)}
                                                                 className="col-span-3"
                                                             />
                                                         </div>
@@ -378,20 +379,18 @@ export default function ProductMgt() {
                             <CardDescription>Add or remove product categories</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className=" space-y-2 mb-4">
-                                <div className="flex space-x-2 ">
+                            <div className="space-y-2 mb-4">
+                                <div className="flex space-x-2">
                                     <Input
                                         placeholder="New category name"
                                         value={newCategory.name}
                                         onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
                                     />
                                     <Input
-                                        placeholder="Category image URL"
-                                        value={newCategory.imgURL}
-                                        onChange={(e) => setNewCategory({ ...newCategory, imgURL: e.target.value })}
+                                        type="file"
+                                        onChange={(e) => handleFileChange(e, setNewCategory)}
                                     />
                                 </div>
-
                                 <Button onClick={handleAddCategory}>Add Category</Button>
                             </div>
                             <div className="flex flex-wrap gap-2">
