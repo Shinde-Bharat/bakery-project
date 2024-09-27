@@ -27,7 +27,7 @@ exports.createOrder = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
     try {
-        const orders = await Order.find();
+        const orders = await Order.find().sort({ _id: -1 });;
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -44,6 +44,16 @@ exports.getOrder = async (req, res) => {
     }
 };
 
+exports.getOrderByOrderId = async (req, res) => {
+    try {
+
+        const order = await Order.findOne({ orderId: req.params.orderId });
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        res.json(order);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 exports.updateOrderStatus = async (req, res) => {
     try {
         const { status } = req.body;
