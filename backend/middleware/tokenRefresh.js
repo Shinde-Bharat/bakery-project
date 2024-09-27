@@ -18,7 +18,7 @@ const tokenRefresh = (req, res, next) => {
             const newToken = jwt.sign(
                 { userId: decoded.userId, role: decoded.role },
                 process.env.JWT_SECRET,
-                { expiresIn: '1h' }
+                { expiresIn: '12h' }
             );
             res.setHeader('x-new-token', newToken);
         }
@@ -31,7 +31,7 @@ const tokenRefresh = (req, res, next) => {
             const newToken = jwt.sign(
                 { userId: refreshDecoded.userId, role: refreshDecoded.role },
                 process.env.JWT_SECRET,
-                { expiresIn: '1h' }
+                { expiresIn: '12h' }
             );
             res.setHeader('x-new-token', newToken);
             req.user = refreshDecoded;

@@ -8,6 +8,7 @@ const offerRoutes = require('./routes/offerRoutes');
 const userRoutes = require('./routes/userRoutes');
 const orderRoutes = require('./routes/orderRoutes')
 const deliveryBoyRoutes = require('./routes/deliveryBoyRoutes')
+const messageRoutes = require('./routes/messageRoutes')
 
 require('dotenv').config();
 const cors = require('cors');
@@ -34,6 +35,7 @@ app.use('/api/offers', offerRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/delivery', deliveryBoyRoutes);
+app.use('/api/message', messageRoutes);
 
 module.exports = app;
 
