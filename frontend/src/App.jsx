@@ -28,6 +28,7 @@ import AdminLogin from './pages/admin/AdminLogin/AdminLogin';
 import DeliveryLogin from './pages/delivery/DeliveryLogin/DeliveryLogin';
 import LandingPage from './pages/user/Landing/LandingPage';
 import NotFound from './pages/common/NotFound';
+import ContactPage from './pages/user/Landing/Contact';
 
 // color-amber
 
@@ -49,10 +50,12 @@ const App = () => {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/confirmedOrdered/:orderId" element={<OrderConfirmedPage />} />
             <Route path="/track" element={<TrackOrderPage />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Route>
 
           <Route path="/login" element={<Login />} />
           <Route path="/privacy_policy" element={<PrivacyPolicy />} />
+
 
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="/admin" element={<AdminOverview />} />
