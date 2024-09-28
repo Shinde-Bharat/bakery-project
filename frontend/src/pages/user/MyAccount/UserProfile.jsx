@@ -277,9 +277,16 @@ export default function UserProfilePage() {
 
                 <TabsContent value="orders">
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Order History</CardTitle>
-                            <CardDescription>View your past orders</CardDescription>
+                        <CardHeader >
+                            <div className="flex justify-between">
+                                <div className="">
+                                    <CardTitle>Order History</CardTitle>
+                                    <CardDescription>View your past orders</CardDescription>
+                                </div>
+                                <Button color="primary" onPress={() => navigate('/track')}>Track Orders</Button>
+                            </div>
+
+
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">

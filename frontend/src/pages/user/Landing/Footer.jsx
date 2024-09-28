@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Instagram, Facebook } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 const Footer = () => {
     return (
@@ -20,7 +21,7 @@ const Footer = () => {
                     {/* Product Column */}
                     <div className="w-full md:w-1/6 mb-6 md:mb-0">
                         <h3 className="text-lg font-semibold mb-2">Product</h3>
-                        <ul className="text-sm">
+                        <ul className="text-sm space-y-2">
                             <li className="mb-1">Cupcake</li>
                             <li className="mb-1">Bun</li>
                             <li className="mb-1">Croissant</li>
@@ -32,20 +33,26 @@ const Footer = () => {
                     {/* Help Column */}
                     <div className="w-full md:w-1/6 mb-6 md:mb-0">
                         <h3 className="text-lg font-semibold mb-2">Help</h3>
-                        <ul className="text-sm">
-                            <li className="mb-1">About Us</li>
-                            <li className="mb-1">Terms & Conditions</li>
-                            <li className="mb-1">Products Returns</li>
+                        <ul className="text-sm space-y-2">
+                            <li><NavLink to={'/contact'} className="mb-1 hover:underline">Contact Us</NavLink></li>
+                            <li><NavLink to={'/track'} className="mb-1 hover:underline">Track Order</NavLink></li>
+                            <li><NavLink to={'/login'} className="mb-1 hover:underline">Login</NavLink></li>
                         </ul>
                     </div>
 
                     {/* Company Column */}
                     <div className="w-full md:w-1/6 mb-6 md:mb-0">
                         <h3 className="text-lg font-semibold mb-2">Company</h3>
-                        <ul className="text-sm">
-                            <li className="mb-1">Who We Are</li>
-                            <li className="mb-1">FAQs</li>
-                            <li className="mb-1">Reviews</li>
+                        <ul className="text-sm space-y-2">
+                            <li>
+
+                                <NavLink to={'/aboutus'} className="mb-1 hover:underline">About Us</NavLink>
+                            </li>
+                            <li>
+
+                                <NavLink to={'/privacy_policy'} className="mb-1 hover:underline">Privacy Policy</NavLink>
+                            </li>
+                            {/* <li className="mb-1">Reviews</li> */}
                         </ul>
                     </div>
 

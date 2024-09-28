@@ -11,7 +11,8 @@ import * as z from 'zod'
 import generateOrderId from "@/services/utils/generateOrderId"
 import { createOrder } from "@/services/apis/order"
 import { toast } from "@/hooks/use-toast"
-
+import { getUserProfile } from "@/services/apis/user"
+import axios from "axios"
 
 const checkoutSchema = z.object({
     fullName: z.string().min(3, { message: "Full name is required" }),
@@ -23,30 +24,27 @@ const checkoutSchema = z.object({
     postalCode: z.string().min(5, { message: "Postal code must be at least 5 digits" }),
 })
 
-const savedAddresses = [
-    { id: 1, name: "Home", address: "123 Main St", city: "Mumbai", country: "India", postalCode: "400001" },
-    { id: 2, name: "Work", address: "456 Office Blvd", city: "Pune", country: "India", postalCode: "411001" },
-]
-
 export default function CheckoutPage() {
     const [step, setStep] = useState(1)
     const navigate = useNavigate()
     const { orderSummary } = useOrderSummary()
-    const [selectedAddress, setSelectedAddress] = useState(savedAddresses[0].name)
+    const [selectedAddress, setSelectedAddress] = useState(null)
     const [order, setOrder] = useState(null)
     const [orderId, setOrderId] = useState(null)
     const { user } = useUser()
-
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const [savedAddresses, setSavedAddresses] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [Paymenting, setPaymenting] = useState(false)
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(checkoutSchema),
         defaultValues: {
             fullName: "",
             email: "",
             phone: "",
-            address: savedAddresses[0].address,
-            city: savedAddresses[0].city,
-            country: savedAddresses[0].country,
-            postalCode: savedAddresses[0].postalCode,
+            address: "",
+            city: "",
+            country: "",
+            postalCode: "",
         },
     })
 
@@ -57,15 +55,40 @@ export default function CheckoutPage() {
         }
         const id = generateOrderId()
         setOrderId(id)
-    }, [orderSummary.total, navigate])
+        fetchUserProfile()
+    }, [orderSummary.total, navigate, user.isLoggedIn])
 
+    const fetchUserProfile = async () => {
+        try {
+            setLoading(true)
+            const profile = await getUserProfile()
+            setSavedAddresses(profile.savedAddresses)
+            if (profile.savedAddresses.length > 0) {
+                setSelectedAddress(profile.savedAddresses[0]._id)
+                populateAddressFields(profile.savedAddresses[0])
+            }
+        } catch (err) {
+            toast({
+                title: "Error",
+                description: "Failed to fetch saved addresses. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const populateAddressFields = (address) => {
+        setValue("address", address.streetName)
+        setValue("city", address.city)
+        setValue("country", address.country)
+        setValue("postalCode", address.zipCode)
+    }
 
     const onSubmit = async (data) => {
-        console.log(order);
-
         if (step < 3) {
             setStep(step + 1)
-            if (step === 1 || step == 2) {
+            if (step === 1 || step === 2) {
                 const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
                 setOrder({
                     orderId: orderId,
@@ -73,7 +96,6 @@ export default function CheckoutPage() {
                         name: data.fullName,
                         number: data.phone,
                     },
-
                     shippingAddress: `${data.address}, ${data.city}, ${data.country} ${data.postalCode}`,
                     postalCode: data.postalCode,
                     date: currentDate,
@@ -82,41 +104,82 @@ export default function CheckoutPage() {
                 })
             }
         } else {
-            // Handle payment logic here
-            console.log(order);
-            // creating new order
+            try {
+                setPaymenting(true)
+                const paymentData = {
+                    userId: user.id,
+                    orderId: order.orderId,
+                    name: order.customer.name,
+                    mobileNumber: order.customer.number,
+                    amount: Math.round(order.total),
+                    customer: {
+                        name: order.customer.name,
+                        number: order.customer.number,
+                    },
+                    shippingAddress: order.shippingAddress,
+                    postalCode: order.postalCode,
+                    date: order.date,
+                    items: order.items,
+                    total: order.total,
+                }
+                try {
 
-            const responce = await createOrder(order);
+                    const response = await createOrder(paymentData)
 
-            toast({
-                title: "Order Created successfully",
-                description: "Order created successfully",
-            });
+                    console.log(response);
+
+                    window.location.href = response.url
+
+                    // if (response.data.msg == "OK" && response.data.status == 200) {
+                    //     const orderCreatedResponce = await createOrder(order)
 
 
+                    //     toast({
+                    //         title: "Order Created Successfully",
+                    //         description: "Your order has been placed successfully.",
+                    //     })
+                    // }
 
-            navigate(`/confirmedOrdered/${order.orderId}`)
+
+                } catch (error) {
+                    console.log("error in payment", error)
+                }
+                // console.log(paymentData);
+
+                // making payment request
+                // if success create order 
+                //  window.location.href = response.data.url
+                // cancle payment- contact page
+
+                // const response = await createOrder(order)
+                // toast({
+                //     title: "Order Created Successfully",
+                //     description: "Your order has been placed successfully.",
+                // })
+                // navigate(`/confirmedOrdered/${order.orderId}`)
+            } catch (error) {
+                console.log(error);
+
+                toast({
+                    title: "Error",
+                    description: "Failed to create order. Please try again.",
+                    variant: "destructive",
+                })
+            }
         }
     }
-
-    const [address, setAddress] = useState()
-    const [city, setCity] = useState()
-    const [country, setCountry] = useState()
-    const [postcode, setPostcode] = useState()
 
     const selectSavedAddress = (id) => {
-        const selectedAddr = savedAddresses.find(addr => addr.name === id)
+        const selectedAddr = savedAddresses.find(addr => addr._id === id)
         if (selectedAddr) {
-            setSelectedAddress(selectedAddr.id)
-
-            setAddress(selectedAddr.address)
-            setCity(selectedAddr.city)
-            setCountry(selectedAddr.country)
-            setPostcode(selectedAddr.postalCode)
-
+            setSelectedAddress(selectedAddr._id)
+            populateAddressFields(selectedAddr)
         }
     }
 
+    if (loading) {
+        return <div>Loading...</div>
+    }
 
     return (
         <div className="px-24 py-8">
@@ -135,19 +198,21 @@ export default function CheckoutPage() {
                                 <CardDescription>Enter your shipping details or select a saved address.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <div>Saved Addresses</div>
-                                    <RadioGroup
-                                        onValueChange={(value) => selectSavedAddress(value)}
-                                        value={selectedAddress.name}
-                                    >
-                                        {savedAddresses.map((address) => (
-                                            <Radio key={address.name} value={address.name} description={address.address}>
-                                                {address.name}
-                                            </Radio>
-                                        ))}
-                                    </RadioGroup>
-                                </div>
+                                {savedAddresses.length > 0 && (
+                                    <div className="space-y-2">
+                                        <div>Saved Addresses</div>
+                                        <RadioGroup
+                                            onValueChange={(value) => selectSavedAddress(value)}
+                                            value={selectedAddress}
+                                        >
+                                            {savedAddresses.map((address) => (
+                                                <Radio key={address._id} value={address._id} description={address.streetName}>
+                                                    {address.addressName}
+                                                </Radio>
+                                            ))}
+                                        </RadioGroup>
+                                    </div>
+                                )}
                                 <Input
                                     id="fullName"
                                     label="Full Name"
@@ -178,7 +243,6 @@ export default function CheckoutPage() {
                                 <Input
                                     id="address"
                                     label="Address"
-                                    value={address}
                                     placeholder="123 Main St"
                                     {...register("address")}
                                     isInvalid={!!errors.address}
@@ -188,7 +252,6 @@ export default function CheckoutPage() {
                                     <Input
                                         id="city"
                                         label="City"
-                                        value={city}
                                         placeholder="Mumbai"
                                         {...register("city")}
                                         isInvalid={!!errors.city}
@@ -197,7 +260,6 @@ export default function CheckoutPage() {
                                     <Input
                                         id="country"
                                         label="Country"
-                                        value={country}
                                         placeholder="India"
                                         {...register("country")}
                                         isInvalid={!!errors.country}
@@ -207,7 +269,6 @@ export default function CheckoutPage() {
                                 <Input
                                     id="postalCode"
                                     label="Postal Code"
-                                    value={postcode}
                                     placeholder="10001"
                                     {...register("postalCode")}
                                     isInvalid={!!errors.postalCode}
@@ -231,7 +292,7 @@ export default function CheckoutPage() {
                                     <div className="space-y-4 w-3/5">
                                         <div>
                                             <h3 className="font-semibold">Customer Details</h3>
-                                            <p>{order.customerName}</p>
+                                            <p>{order.customer.name}</p>
                                         </div>
                                         <div>
                                             <h3 className="font-semibold">Shipping Address</h3>
@@ -259,7 +320,6 @@ export default function CheckoutPage() {
                                                 ))}
                                             </TableBody>
                                         </Table>
-
                                         <div className="flex justify-between text-lg font-bold">
                                             <span>Total</span>
                                             <span>₹{order.total.toFixed(2)}</span>
@@ -289,7 +349,7 @@ export default function CheckoutPage() {
                                 <Button type="button" variant="outline" className="mr-2" onClick={() => setStep(2)}>
                                     Back
                                 </Button>
-                                <Button type="submit" color="primary" variant="solid">Pay Now</Button>
+                                <Button type="submit" color="primary" variant="solid" isLoading={Paymenting}>Pay Now</Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>

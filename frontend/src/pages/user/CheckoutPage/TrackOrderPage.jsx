@@ -1,36 +1,76 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, Truck, CheckCircle, AlertCircle } from "lucide-react"
 import { Button } from "@nextui-org/button"
 import { Input } from "@nextui-org/react"
-
-// Mock order data
-const orderData = {
-    orderId: "ORD-12345-ABCDE",
-    status: "In Transit",
-    estimatedDelivery: "May 22, 2023",
-    items: [
-        { id: 1, name: "Wireless Earbuds", quantity: 1 },
-        { id: 2, name: "Smart Watch", quantity: 1 },
-        { id: 3, name: "Portable Charger", quantity: 2 },
-    ],
-    timeline: [
-        { id: 1, status: "Order Placed", date: "May 15, 2023", time: "10:30 AM", completed: true },
-        { id: 2, status: "Processing", date: "May 16, 2023", time: "2:45 PM", completed: true },
-        { id: 3, status: "Shipped", date: "May 17, 2023", time: "11:15 AM", completed: true },
-        { id: 4, status: "In Transit", date: "May 18, 2023", time: "9:00 AM", completed: true },
-        { id: 5, status: "Out for Delivery", date: "Pending", time: "", completed: false },
-        { id: 6, status: "Delivered", date: "Pending", time: "", completed: false },
-    ],
-}
+import { toast } from "@/hooks/use-toast"
+import { trackOrderByOrderId } from "@/services/apis/order"
 
 export default function TrackOrderPage() {
     const [orderId, setOrderId] = useState("")
+    const [orderData, setOrderData] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
 
-    const handleTrackOrder = (e) => {
+
+
+    const handleTrackOrder = async (e) => {
         e.preventDefault()
-        // In a real application, you would fetch the order data based on the orderId
-        console.log("Tracking order:", orderId)
+        setLoading(true)
+        try {
+            const order = await trackOrderByOrderId(orderId)
+            setOrderData(order)
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to fetch order details. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const getStatusIndex = (status) => {
+        const statusOrder = ['processing', 'packed', 'out for delivery', 'delivered']
+        return statusOrder.indexOf(status)
+    }
+
+    const renderTimeline = () => {
+        const statusOrder = [
+            { status: 'Processing', icon: Package },
+            { status: 'Packed', icon: Package },
+            { status: 'Out for Delivery', icon: Truck },
+            { status: 'Delivered', icon: CheckCircle },
+        ]
+
+        const currentStatusIndex = getStatusIndex(orderData.status)
+
+        return (
+            <ol className="relative border-l border-gray-200 font-Montserrat">
+                {statusOrder.map((step, index) => {
+                    const isCompleted = index <= currentStatusIndex
+                    const Icon = step.icon
+                    return (
+                        <li key={index} className="mb-10 ml-6">
+                            <span
+                                className={`absolute flex items-center justify-center w-8 h-8 rounded-full -left-4 ring-4 ring-white ${isCompleted ? "bg-green-200" : "bg-gray-100"
+                                    }`}
+                            >
+                                <Icon className={`w-5 h-5 ${isCompleted ? "text-green-500" : "text-gray-500"}`} />
+                            </span>
+                            <h3 className="font-medium leading-tight">{step.status}</h3>
+                            {index === currentStatusIndex && (
+                                <p className="text-sm">
+                                    {new Date(orderData.date).toLocaleDateString()} {new Date(orderData.date).toLocaleTimeString()}
+                                </p>
+                            )}
+                        </li>
+                    )
+                })}
+            </ol>
+        )
     }
 
     return (
@@ -50,7 +90,9 @@ export default function TrackOrderPage() {
                             onChange={(e) => setOrderId(e.target.value)}
                             className="flex-grow"
                         />
-                        <Button type="submit">Track</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? "Tracking..." : "Track"}
+                        </Button>
                     </form>
                 </CardContent>
             </Card>
@@ -65,8 +107,10 @@ export default function TrackOrderPage() {
                         <CardContent>
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <p className="text-lg font-semibold">{orderData.status}</p>
-                                    <p className="text-sm text-gray-500">Estimated Delivery: {orderData.estimatedDelivery}</p>
+                                    <p className="text-lg font-semibold capitalize">{orderData.status}</p>
+                                    <p className="text-sm text-gray-500">
+                                        Order Date: {new Date(orderData.date).toLocaleDateString()}
+                                    </p>
                                 </div>
                                 <Package className="w-12 h-12 text-primary" />
                             </div>
@@ -77,27 +121,7 @@ export default function TrackOrderPage() {
                         <CardHeader>
                             <CardTitle>Order Timeline</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <ol className="relative border-l border-gray-200">
-                                {orderData.timeline.map((event, index) => (
-                                    <li key={event.id} className="mb-10 ml-6">
-                                        <span
-                                            className={`absolute flex items-center justify-center w-8 h-8 rounded-full -left-4 ring-4 ring-white ${event.completed ? "bg-green-200" : "bg-gray-100"
-                                                }`}
-                                        >
-                                            {event.completed ? (
-                                                <CheckCircle className="w-5 h-5 text-green-500" />
-                                            ) : (
-                                                <AlertCircle className="w-5 h-5 text-gray-500" />
-                                            )}
-                                        </span>
-                                        <h3 className="font-medium leading-tight">{event.status}</h3>
-                                        <p className="text-sm">{event.date}</p>
-                                        {event.time && <p className="text-xs text-gray-500">{event.time}</p>}
-                                    </li>
-                                ))}
-                            </ol>
-                        </CardContent>
+                        <CardContent>{renderTimeline()}</CardContent>
                     </Card>
 
                     <Card>
@@ -107,18 +131,26 @@ export default function TrackOrderPage() {
                         <CardContent>
                             <h3 className="font-semibold mb-2">Items in your order:</h3>
                             <ul className="list-disc list-inside space-y-1">
-                                {orderData.items.map((item) => (
-                                    <li key={item.id}>
-                                        {item.name} x {item.quantity}
+                                {orderData.items.map((item, index) => (
+                                    <li key={index}>
+                                        {item.name} x {item.quantity} - ₹{(item.price * item.quantity).toFixed(2)}
                                     </li>
                                 ))}
                             </ul>
+                            <div className="mt-4">
+                                <p className="font-semibold">Total: ₹{orderData.total.toFixed(2)}</p>
+                            </div>
                         </CardContent>
                         <CardFooter>
-                            <Button variant="outline" className="w-full">
-                                <Truck className="w-4 h-4 mr-2" />
-                                View Shipping Details
-                            </Button>
+                            <div className="w-full space-y-2">
+                                <h3 className="font-semibold">Shipping Details:</h3>
+                                <p>{orderData.customer.name}</p>
+                                <p>{orderData.shippingAddress}</p>
+                                <p>{orderData.postalCode}</p>
+                                {orderData.deliveryBoy && (
+                                    <p className="mt-2">Delivery Person: {orderData.deliveryBoy.name}</p>
+                                )}
+                            </div>
                         </CardFooter>
                     </Card>
                 </div>

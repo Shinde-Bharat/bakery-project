@@ -7,7 +7,7 @@ import { API_URL } from '@/constants/constants';
 export const createOrder = async (orderData) => {
     try {
         const { token, refreshToken } = getTokens();
-        const response = await axios.post(`${API_URL}/api/orders`, orderData, {
+        const response = await axios.post(`${API_URL}/create-order`, orderData, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "x-refresh-token": refreshToken,
@@ -59,6 +59,22 @@ export const getOrderByOrderId = async (orderId) => {
     try {
         const { token, refreshToken } = getTokens();
         const response = await axios.get(`${API_URL}/api/orders/by-order-id/${orderId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "x-refresh-token": refreshToken,
+            },
+        });
+        replaceJWTIfRefreshed(response);
+        return response.data;
+    } catch (error) {
+        console.error("Fetching order by orderId failed:", error);
+        throw error;
+    }
+};
+export const trackOrderByOrderId = async (orderId) => {
+    try {
+        const { token, refreshToken } = getTokens();
+        const response = await axios.get(`${API_URL}/api/orders/track/${orderId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "x-refresh-token": refreshToken,

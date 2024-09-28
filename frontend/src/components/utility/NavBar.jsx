@@ -23,13 +23,6 @@ export default function NavBar() {
         { name: "Contact Us", path: "/contact" }
     ];
 
-    const menuItems = [
-        "Profile",
-        "Dashboard",
-        "Activity",
-        "Analytics",
-        "Log Out",
-    ];
     // shouldHideOnScroll isBordered
     return (
         <Navbar className="font-Montserrat" shouldHideOnScroll isBordered onMenuOpenChange={setIsMenuOpen}>
@@ -103,17 +96,17 @@ export default function NavBar() {
                 </NavbarItem>
             </NavbarContent>
             <NavbarMenu>
-                {menuItems.map((item, index) => (
-                    <NavbarMenuItem key={`${item}-${index}`}>
+                {navItems.map((item, index) => (
+                    <NavbarMenuItem key={`${item.name}-${index}`}>
                         <NavLink
                             color={
-                                index === 2 ? "primary" : index === menuItems.length - 1 ? "danger" : "foreground"
+                                index === 2 ? "primary" : index === navItems.length - 1 ? "danger" : "foreground"
                             }
                             className="w-full"
-                            href="#"
+                            to={item.path}
                             size="lg"
                         >
-                            {item}
+                            {item.name}
                         </NavLink>
                     </NavbarMenuItem>
                 ))}

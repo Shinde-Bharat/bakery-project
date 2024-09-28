@@ -29,6 +29,7 @@ import DeliveryLogin from './pages/delivery/DeliveryLogin/DeliveryLogin';
 import LandingPage from './pages/user/Landing/LandingPage';
 import NotFound from './pages/common/NotFound';
 import ContactPage from './pages/user/Landing/ContactPage';
+import PaymentStatus from './pages/user/CheckoutPage/PaymentStatus';
 
 // color-amber
 
@@ -51,6 +52,7 @@ const App = () => {
             <Route path="/confirmedOrdered/:orderId" element={<OrderConfirmedPage />} />
             <Route path="/track" element={<TrackOrderPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/payment-status" element={<PaymentStatus />} />
           </Route>
 
           <Route path="/login" element={<Login />} />
