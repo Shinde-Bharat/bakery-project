@@ -5,6 +5,8 @@ const User = require('../models/User');
 
 exports.createOrder = async (req, res) => {
     try {
+        // console.log("create order :", req);
+
         const order = new Order(req.body);
         await order.save();
 
@@ -19,9 +21,11 @@ exports.createOrder = async (req, res) => {
         });
         await user.save();
 
-        res.status(201).json(order);
+        // res.status(201).json(order);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        // res.status(400).json({ message: error.message });
+        console.log(error.message);
+
     }
 };
 
