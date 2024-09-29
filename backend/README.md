@@ -1,22 +1,50 @@
 ```
 backend/
-  ├── models/
-  │   ├── Product.js
-  │   ├── Category.js
-  │   ├── Coupon.js
-  │   └── Offer.js
-  ├── controllers/
-  │   ├── productController.js
-  │   ├── categoryController.js
-  │   ├── couponController.js
-  │   └── offerController.js
-  ├── routes/
-  │   ├── productRoutes.js
-  │   ├── categoryRoutes.js
-  │   ├── couponRoutes.js
-  │   └── offerRoutes.js
-  ├── app.js
-  └── server.js
+┣ controllers/
+┃ ┣ categoryController.js
+┃ ┣ couponController.js
+┃ ┣ deliveryBoyController.js
+┃ ┣ messageController.js
+┃ ┣ offerController.js
+┃ ┣ orderController.js
+┃ ┣ productController.js
+┃ ┗ userController.js
+┣ mailTemplates/
+┃ ┣ contactTemplate.js
+┃ ┗ orderTemplate.js
+┣ middleware/
+┃ ┣ adminAuth.js
+┃ ┣ auth.js
+┃ ┣ deliveryBoyAuth.js
+┃ ┗ tokenRefresh.js
+┣ models/
+┃ ┣ Category.js
+┃ ┣ Coupon.js
+┃ ┣ DeliveryBoy.js
+┃ ┣ Message.js
+┃ ┣ Offer.js
+┃ ┣ Order.js
+┃ ┣ Product.js
+┃ ┗ User.js
+┣ routes/
+┃ ┣ categoryRoutes.js
+┃ ┣ couponRoutes.js
+┃ ┣ deliveryBoyRoutes.js
+┃ ┣ messageRoutes.js
+┃ ┣ offerRoutes.js
+┃ ┣ orderRoutes.js
+┃ ┣ productRoutes.js
+┃ ┗ userRoutes.js
+┣ services/
+┃ ┣ cloudinaryConfig.js
+┃ ┗ emailConfig.js
+┣ .env
+┣ .gitignore
+┣ app.js
+┣ package-lock.json
+┣ package.json
+┣ README.md
+┗ server.js
 ```
 Products:
 
