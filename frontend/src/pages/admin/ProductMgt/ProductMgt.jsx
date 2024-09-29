@@ -31,7 +31,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { Search, Plus, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@nextui-org/button"
-import { Input } from "@nextui-org/react"
+import { Input, Textarea } from "@nextui-org/react"
 import { createProduct, getAllProducts, updateProduct, deleteProduct } from "@/services/apis/products"
 import { createCategory, getAllCategories, deleteCategory } from "@/services/apis/categories"
 
@@ -46,6 +46,7 @@ export default function ProductMgt() {
         category: "",
         price: "",
         avlQuantity: "",
+        description: "",
         image: null,
     })
     const [newCategory, setNewCategory] = useState({
@@ -89,7 +90,7 @@ export default function ProductMgt() {
         try {
             await createProduct(newProduct)
             fetchData()
-            setNewProduct({ name: "", category: "", price: "", avlQuantity: "", image: null })
+            setNewProduct({ name: "", category: "", price: "", avlQuantity: "", image: null, description: "" })
         } catch (error) {
             console.error("Error adding product:", error)
         }
@@ -189,6 +190,17 @@ export default function ProductMgt() {
                                                 id="name"
                                                 value={newProduct.name}
                                                 onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                                                className="col-span-3"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="description" className="text-right">
+                                                Description
+                                            </Label>
+                                            <Textarea
+                                                id="description"
+                                                value={newProduct.description}
+                                                onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
                                                 className="col-span-3"
                                             />
                                         </div>
@@ -299,6 +311,17 @@ export default function ProductMgt() {
                                                                 id="edit-name"
                                                                 value={editingProduct?.name || ""}
                                                                 onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                                                                className="col-span-3"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label htmlFor="edit-description" className="text-right">
+                                                                Description
+                                                            </Label>
+                                                            <Textarea
+                                                                id="edit-description"
+                                                                value={editingProduct?.description || ""}
+                                                                onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
                                                                 className="col-span-3"
                                                             />
                                                         </div>

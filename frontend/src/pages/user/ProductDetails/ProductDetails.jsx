@@ -6,31 +6,36 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, Tab } from "@nextui-org/tabs";
 import ProductCard from '@/components/utility/ProductCard';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCart, useWishlist } from '@/hooks/reduxHooks';
-import { getProduct } from '@/services/apis/products';
-import { Image } from '@nextui-org/react';
+import { useCart, useWishlist, useUser } from '@/hooks/reduxHooks';
+import { getProduct, addReview, getRecommendations } from '@/services/apis/products';
+import { Image, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input, Textarea } from '@nextui-org/react';
 import { toast } from '@/hooks/use-toast';
 
 export default function ProductDetails() {
     const [quantity, setQuantity] = useState(1)
     const [product, setProduct] = useState(null)
     const navigate = useNavigate()
+    const [recommendations, setRecommendations] = useState([])
+    const [reviewText, setReviewText] = useState('')
+    const [reviewRating, setReviewRating] = useState(0)
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const { addToWishlist, wishlist, removeFromWishlist } = useWishlist()
     const { cart, addItem, removeItem, updateItemQuantity } = useCart()
+    const { user } = useUser()
 
     const { id } = useParams()
-
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const productData = await getProduct(id)
-                // console.log("product data ", productData);
                 setProduct(productData)
 
-                // Set initial quantity to 1 or the cart item quantity if it exists
                 const cartItem = cart.items.find(item => item._id === productData._id)
                 setQuantity(cartItem ? cartItem.quantity : 1)
+
+                const recommendationsData = await getRecommendations(id)
+                setRecommendations(recommendationsData)
             } catch (error) {
                 console.log(error);
             }
@@ -77,29 +82,40 @@ export default function ProductDetails() {
     }
 
 
-    // const product = {
-    //     name: "Chocolate Delight Cupcake",
-    //     price: 3.99,
-    //     description: "Indulge in our rich, moist chocolate cupcake topped with a swirl of creamy chocolate frosting. Each bite is a heavenly experience for chocolate lovers.",
-    //     image: "https://g-l--q8r-vryke.vusercontent.net/placeholder.svg?height=400&width=400",
-    //     rating: 4.8,
-    //     reviews: [
-    //         { author: "Jane Doe", rating: 5, comment: "Absolutely delicious! The chocolate flavor is intense and satisfying." },
-    //         { author: "John Smith", rating: 4, comment: "Great cupcake, but a bit too sweet for my taste." },
-    //     ],
-    // }
+    const handleAddReview = async () => {
+        if (!user.isLoggedIn) {
+            toast({
+                title: "Login Required",
+                description: "You must be logged in to add a review.",
+                variant: "warning",
+            });
+            return;
+        }
 
-    const bakeryData = [
-        { id: 1, name: "Chocolate Cake", price: 499, image: "/cake1.jpg", rating: 4.8 },
-        { id: 2, name: "Strawberry Cheesecake", price: 599, image: "/cake2.jpg", rating: 4.6 },
-        { id: 3, name: "Blueberry Muffin", price: 199, image: "/muffin.jpg", rating: 4.7 },
-        { id: 4, name: "Donut", price: 99, image: "/donut.jpg", rating: 4.5 },
-        { id: 5, name: "Red Velvet Cupcake", price: 149, image: "/cupcake.jpg", rating: 4.9 },
-        { id: 6, name: "Croissant", price: 79, image: "/croissant.jpg", rating: 4.3 },
-    ];
+        try {
+            await addReview(product._id, { text: reviewText, rating: reviewRating });
+            const updatedProduct = await getProduct(id);
+            setProduct(updatedProduct);
+            onClose();
+            toast({
+                title: "Review Added",
+                description: "Your review has been successfully added.",
+                variant: "success",
+            });
+        } catch (error) {
+            console.error("Error adding review:", error);
+            toast({
+                title: "Error",
+                description: "Failed to add review. Please try again.",
+                variant: "destructive",
+            });
+        }
+    }
 
-    // const isInWishlist = wishlist.some(item => item._id === product?._id);
-    // const isInCart = cart.items.some(item => item.product._id === product?._id);
+
+
+    console.log("recommendations;", recommendations);
+
 
 
     return (
@@ -114,9 +130,9 @@ export default function ProductDetails() {
                         <h1 className="text-lg text-slate-800 font-semibold mb-2">{product.category.name}</h1>
                         <div className="flex items-center mb-4">
                             {Array(5).fill(0).map((_, i) => (
-                                <Star key={i} className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                                <Star key={i} className={`w-5 h-5 ${i < Math.floor(product.averageRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
                             ))}
-                            <span className="ml-2 text-sm text-gray-600">{product.rating} ({product.reviews.length} reviews)</span>
+                            <span className="ml-2 text-sm text-gray-600">{Math.floor(product.averageRating)} Rating ({product.reviews.length} reviews)</span>
                         </div>
                         <p className="text-2xl font-bold text-primary mb-4">₹{product.price.toFixed(2)}</p>
                         <p className="mb-6">{product.description}</p>
@@ -173,12 +189,7 @@ export default function ProductDetails() {
                             </CardHeader>
                             <CardContent>
                                 <p>{product.description}</p>
-                                <ul className="list-disc list-inside mt-4">
-                                    <li>Made with premium cocoa powder</li>
-                                    <li>Topped with rich chocolate frosting</li>
-                                    <li>Baked fresh daily</li>
-                                    <li>Perfect for birthdays and special occasions</li>
-                                </ul>
+
                             </CardContent>
                         </Card>
                     </Tab>
@@ -192,20 +203,25 @@ export default function ProductDetails() {
                                 {product.reviews.map((review, index) => (
                                     <div key={index} className="mb-4 last:mb-0">
                                         <div className="flex items-center mb-2">
-                                            <span className="font-bold mr-2">{review.author}</span>
+                                            <span className="font-bold mr-2">{review.user.name}</span>
                                             <div className="flex">
                                                 {Array(5).fill(0).map((_, i) => (
                                                     <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
                                                 ))}
                                             </div>
                                         </div>
-                                        <p>{review.comment}</p>
+                                        <p>{review.text}</p>
                                         {index < product.reviews.length - 1 && <Separator className="my-4" />}
                                     </div>
                                 ))}
                             </CardContent>
                             <CardFooter>
-                                <Button variant="outline">Write a Review</Button>
+                                {
+                                    user.isLoggedIn ?
+                                        <Button variant="outline" onPress={onOpen}>Write a Review</Button> :
+                                        <Button variant="outline" >Login to review</Button>
+                                }
+
                             </CardFooter>
                         </Card>
                     </Tab>
@@ -213,20 +229,51 @@ export default function ProductDetails() {
 
                 <Separator className="my-12" />
 
-                <section>
-                    <h2 className="text-2xl font-bold mb-6 text-bprimary">You May Also Like</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                        {bakeryData.map((product) => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                onAddToCart={() => addToCart(product.id)}
-                                onRemoveFromFavorites={() => removeFromFavorites(product.id)}
+                {
+                    recommendations.length > 0 &&
+                    <section>
+                        <h2 className="text-2xl font-bold mb-6 text-bprimary">You May Also Like</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                            {recommendations.map((product) => (
+                                <ProductCard
+                                    key={product._id}
+                                    product={product}
 
+                                />
+                            ))}
+                        </div>
+                    </section>
+                }
+
+                <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalContent>
+                        <ModalHeader>Write a Review</ModalHeader>
+                        <ModalBody>
+                            <div className="flex mb-4">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                        key={star}
+                                        className={`w-6 h-6 cursor-pointer ${star <= reviewRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                                        onClick={() => setReviewRating(star)}
+                                    />
+                                ))}
+                            </div>
+                            <Textarea
+                                placeholder="Write your review here..."
+                                value={reviewText}
+                                onChange={(e) => setReviewText(e.target.value)}
                             />
-                        ))}
-                    </div>
-                </section>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="danger" variant="light" onPress={onClose}>
+                                Cancel
+                            </Button>
+                            <Button color="primary" onPress={handleAddReview}>
+                                Submit Review
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
             </div>
         }
 
