@@ -133,7 +133,7 @@ export default function UserMgt() {
     )
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8  overflow-y-scroll max-h-screen">
             <h1 className="text-3xl font-bold mb-8">User Management</h1>
 
             <div className="flex justify-between">

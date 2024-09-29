@@ -108,7 +108,7 @@ export default function OrderManagementPage() {
 
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8  overflow-y-scroll max-h-screen">
             <h1 className="text-3xl font-bold mb-8">Order Management</h1>
 
             <div className="flex justify-between items-center mb-6">
@@ -167,7 +167,7 @@ export default function OrderManagementPage() {
                                     <div className="flex space-x-2">
                                         <Dialog>
                                             <DialogTrigger asChild>
-                                                <Button variant="outline" onClick={() => setSelectedOrder(order)}>
+                                                <Button variant="flat" color="primary" onClick={() => setSelectedOrder(order)}>
                                                     Update Status
                                                 </Button>
                                             </DialogTrigger>

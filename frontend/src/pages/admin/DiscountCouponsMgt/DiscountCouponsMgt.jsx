@@ -138,7 +138,7 @@ export default function DiscountCouponsMgt() {
 
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8  overflow-y-scroll max-h-screen">
             <h1 className="text-3xl font-bold mb-8">Offers and Coupons Management</h1>
 
             <Tabs defaultValue="coupons" className="space-y-4">

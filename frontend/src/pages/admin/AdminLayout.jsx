@@ -35,7 +35,7 @@ const AdminLayout = () => {
         <> {
 
             isAdmin &&
-            <div className="flex h-screen bg-gray-100 font-Montserrat">
+            <div className="flex h-screen  font-Montserrat">
                 {/* This will render the child routes dynamically */}
                 <SideNav navItems={navItems} />
                 <Outlet />
