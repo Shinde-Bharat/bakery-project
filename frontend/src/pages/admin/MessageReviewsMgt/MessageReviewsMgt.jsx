@@ -5,7 +5,7 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from 
 import { Select, SelectItem } from "@nextui-org/react"
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react"
 import { Card, CardHeader, CardBody } from "@nextui-org/react"
-import { Badge } from "@nextui-org/react"
+import { Badge } from '@/components/ui/badge'
 import { Star, Search, MessageCircle, Trash2, Send } from 'lucide-react'
 import { getAllMessages, updateMessageStatus } from '@/services/apis/message'
 
@@ -17,6 +17,7 @@ export default function MessageReviewsMgt() {
     const [selectedMessage, setSelectedMessage] = useState(null)
     const [replyText, setReplyText] = useState("")
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [sendingMail, setsendingMail] = useState(false)
 
     useEffect(() => {
         fetchMessages()
@@ -46,6 +47,7 @@ export default function MessageReviewsMgt() {
     }
 
     const handleReplySubmit = async () => {
+        setsendingMail(true)
         if (selectedMessage) {
             try {
                 await updateMessageStatus(selectedMessage._id, { status: 'replied', replyMsg: replyText })
@@ -55,6 +57,8 @@ export default function MessageReviewsMgt() {
                 setReplyText("")
                 setSelectedMessage(null)
                 setIsModalOpen(false)
+                setsendingMail(false)
+                getAllMessages()
             } catch (error) {
                 console.error("Error sending reply:", error)
             }
@@ -116,7 +120,7 @@ export default function MessageReviewsMgt() {
                             <TableCell>{message.subject}</TableCell>
                             <TableCell>{new Date(message.date).toLocaleDateString()}</TableCell>
                             <TableCell>
-                                <Badge color={message.status === 'unread' ? 'danger' : message.status === 'read' ? 'primary' : 'success'}>
+                                <Badge className={message.status === 'unread' ? 'bg-blue-500' : message.status === 'read' ? 'bg-yellow-500' : 'bg-green-500'}>
                                     {message.status}
                                 </Badge>
                             </TableCell>
@@ -124,6 +128,7 @@ export default function MessageReviewsMgt() {
                                 <Button
                                     color="primary"
                                     auto
+
                                     onClick={() => {
                                         setSelectedMessage(message)
                                         setIsModalOpen(true)
@@ -152,12 +157,16 @@ export default function MessageReviewsMgt() {
                                         <p><strong>Email:</strong> {selectedMessage.email}</p>
                                         <p><strong>Subject:</strong> {selectedMessage.subject}</p>
                                         <p><strong>Message:</strong> {selectedMessage.message}</p>
-                                        <Textarea
-                                            label="Reply"
-                                            placeholder="Type your reply here..."
-                                            value={replyText}
-                                            onChange={(e) => setReplyText(e.target.value)}
-                                        />
+                                        {
+                                            selectedMessage.status === "replied" ?
+                                                <p><strong>Reply Message:</strong> {selectedMessage.replyMsg}</p> : <Textarea
+                                                    label="Reply"
+                                                    placeholder="Type your reply here..."
+                                                    value={replyText}
+                                                    onChange={(e) => setReplyText(e.target.value)}
+                                                />
+                                        }
+
                                     </>
                                 )}
                             </ModalBody>
@@ -165,9 +174,12 @@ export default function MessageReviewsMgt() {
                                 <Button color="danger" variant="light" onPress={onClose}>
                                     Close
                                 </Button>
-                                <Button color="primary" onPress={handleReplySubmit}>
-                                    Send Reply
-                                </Button>
+                                {
+                                    selectedMessage.status !== "replied" && <Button color="primary" isLoading={sendingMail} onPress={handleReplySubmit}>
+                                        Send Reply
+                                    </Button>
+                                }
+
                             </ModalFooter>
                         </>
                     )}

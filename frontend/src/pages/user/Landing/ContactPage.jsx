@@ -110,7 +110,7 @@ export default function ContactPage() {
                             <form onSubmit={contactform.handleSubmit(onSubmit)} className="flex flex-col gap-4">
                                 <Input
                                     isRequired
-                                    label="name"
+                                    label="Name"
                                     isInvalid={!!contactform.formState.errors.name}
                                     errorMessage={contactform.formState.errors.name?.message}
                                     placeholder="Enter your name"
@@ -118,25 +118,25 @@ export default function ContactPage() {
                                 />
                                 <Input
                                     isRequired
-                                    label="email"
+                                    label="Email"
                                     isInvalid={!!contactform.formState.errors.email}
                                     errorMessage={contactform.formState.errors.email?.message}
                                     placeholder="Enter your email"
                                     {...contactform.register("email")}
                                 />
                                 <Input
-                                    label="subject"
+                                    label="Subject"
                                     isInvalid={!!contactform.formState.errors.subject}
                                     errorMessage={contactform.formState.errors.subject?.message}
                                     placeholder="Enter your subject"
                                     {...contactform.register("subject")}
                                 />
-                                <Input
+                                <Textarea
                                     isRequired
-                                    label="message"
+                                    label="Message"
                                     isInvalid={!!contactform.formState.errors.message}
                                     errorMessage={contactform.formState.errors.message?.message}
-                                    placeholder="Enter your message"
+                                    placeholder="Write your message"
                                     {...contactform.register("message")}
                                 />
                                 <Button color='primary' type="submit" disabled={isSubmitting}>
