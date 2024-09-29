@@ -1,6 +1,6 @@
 
 const Offer = require('../models/Offer');
-const cloudinary = require('../fileUpload/cloudinaryConfig')
+const cloudinary = require('../services/cloudinaryConfig')
 
 
 exports.createOffer = async (req, res) => {

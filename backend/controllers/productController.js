@@ -1,6 +1,6 @@
 // controllers/productController.js
 const Product = require('../models/Product');
-const cloudinary = require('../fileUpload/cloudinaryConfig')
+const cloudinary = require('../services/cloudinaryConfig')
 
 
 exports.createProduct = async (req, res) => {

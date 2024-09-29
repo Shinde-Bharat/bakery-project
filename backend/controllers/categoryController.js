@@ -1,5 +1,5 @@
 const Category = require('../models/Category');
-const cloudinary = require('../fileUpload/cloudinaryConfig')
+const cloudinary = require('../services/cloudinaryConfig')
 
 
 

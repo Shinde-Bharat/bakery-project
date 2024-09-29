@@ -1,4 +1,6 @@
-const Message = require('../models/Message')
+const Message = require('../models/Message');
+const transporterMail = require('../services/emailConfig')
+const contactTemplate = require('../mailTemplates/contactTemplate')
 
 exports.createMessage = async (req, res) => {
     try {
@@ -38,8 +40,26 @@ exports.updateMessageStatus = async (req, res) => {
         if (!updatedMessage) {
             return res.status(404).json({ message: 'Message not found' });
         }
+
+        // Send email to the user
+        if (status === 'replied' && replyMsg) {
+            try {
+                await transporterMail.sendMail({
+                    from: process.env.EMAIL_FROM,
+                    to: updatedMessage.email,
+                    subject: `Re: ${updatedMessage.subject}`,
+                    text: replyMsg,
+                    html: contactTemplate(updatedMessage.name, updatedMessage.message, replyMsg, updatedMessage.date),
+                });
+            } catch (e) {
+                console.log("Error while sending message", e);
+
+            }
+
+        }
+
         res.status(200).json(updatedMessage);
     } catch (error) {
         res.status(400).json({ message: 'Error updating contact status', error: error.message });
     }
-};
+}
