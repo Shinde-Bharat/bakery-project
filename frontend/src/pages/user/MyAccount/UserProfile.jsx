@@ -1,16 +1,13 @@
-
+'use client'
 
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Pencil, Plus, Trash2, LogOut, Eye } from "lucide-react"
-import { Button } from "@nextui-org/button"
-import { Input } from "@nextui-org/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/hooks/use-toast"
-import { useNavigate } from "react-router-dom"
-import { getUserProfile, updateUserProfile, addAddress, deleteAddress, getUserOrders } from "@/services/apis/user"
 import {
     Dialog,
     DialogContent,
@@ -20,6 +17,9 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { useUser } from "@/hooks/reduxHooks"
+import { getUserProfile, updateUserProfile, addAddress, deleteAddress, getUserOrders } from "@/services/apis/user"
+import { Button } from "@nextui-org/button"
+import { Input } from "@nextui-org/react"
 
 export default function UserProfilePage() {
     const [userData, setUserData] = useState(null)
@@ -28,19 +28,17 @@ export default function UserProfilePage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [selectedOrder, setSelectedOrder] = useState(null)
+    const [activeTab, setActiveTab] = useState("profile")
     const navigate = useNavigate()
-    const { user, logout } = useUser()
+    const { user, updateProfile, logout } = useUser()
 
     useEffect(() => {
-        const luser = JSON.parse(localStorage.getItem('user'));
+        const luser = JSON.parse(localStorage.getItem('user'))
         if (luser?.token && user.isLoggedIn) {
-
             fetchUserProfile()
         } else {
             navigate('/login')
         }
-
-
     }, [])
 
     const fetchUserProfile = async () => {
@@ -48,6 +46,7 @@ export default function UserProfilePage() {
             setLoading(true)
             const profile = await getUserProfile()
             setUserData(profile)
+            updateProfile(profile)
         } catch (err) {
             setError("Failed to fetch user profile")
             toast({
@@ -65,6 +64,7 @@ export default function UserProfilePage() {
         try {
             const updatedProfile = await updateUserProfile({ name: userData.name })
             setUserData(updatedProfile)
+            updateProfile(updatedProfile)
             setEditMode(false)
             toast({
                 title: "Success",
@@ -83,7 +83,9 @@ export default function UserProfilePage() {
         e.preventDefault()
         try {
             const updatedAddresses = await addAddress(newAddress)
-            setUserData({ ...userData, savedAddresses: updatedAddresses })
+            const updatedUserData = { ...userData, savedAddresses: updatedAddresses }
+            setUserData(updatedUserData)
+            updateProfile(updatedUserData)
             setNewAddress({ addressName: "", streetName: "", city: "", state: "", zipCode: "", country: "" })
             toast({
                 title: "Success",
@@ -101,7 +103,9 @@ export default function UserProfilePage() {
     const handleAddressDelete = async (addressId) => {
         try {
             const updatedAddresses = await deleteAddress(addressId)
-            setUserData({ ...userData, savedAddresses: updatedAddresses })
+            const updatedUserData = { ...userData, savedAddresses: updatedAddresses }
+            setUserData(updatedUserData)
+            updateProfile(updatedUserData)
             toast({
                 title: "Success",
                 description: "Address deleted successfully.",
@@ -116,17 +120,39 @@ export default function UserProfilePage() {
     }
 
     const handleLogout = () => {
-        // In a real application, you would implement logout logic here
-        localStorage.removeItem('user');
+        localStorage.removeItem('user')
         logout()
         toast({
             title: "Logout Successful",
             description: "We'll miss you!",
-        });
-        navigate('/');
-        console.log("User logged out")
+        })
+        navigate('/')
     }
 
+    const handleOrderHistoryClick = async () => {
+        try {
+            setLoading(true)
+            const orders = await getUserOrders()
+            const updatedUserData = { ...userData, orderHistory: orders }
+            setUserData(updatedUserData)
+            updateProfile(updatedUserData)
+        } catch (err) {
+            toast({
+                title: "Error",
+                description: "Failed to fetch order history. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleTabChange = (value) => {
+        setActiveTab(value)
+        if (value === "orders") {
+            handleOrderHistoryClick()
+        }
+    }
 
     if (loading) return <div>Loading...</div>
     if (error) return <div>Error: {error}</div>
@@ -136,7 +162,7 @@ export default function UserProfilePage() {
         <div className="px-24 py-8 font-Montserrat">
             <h1 className="text-3xl font-bold mb-8">User Profile</h1>
 
-            <Tabs defaultValue="profile" className="space-y-4">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="profile">Profile</TabsTrigger>
                     <TabsTrigger value="addresses">Addresses</TabsTrigger>
@@ -154,6 +180,7 @@ export default function UserProfilePage() {
                                 <div className="space-y-4">
                                     <div className="flex items-center space-x-4">
                                         <Avatar className="w-20 h-20">
+                                            <AvatarImage src={userData.avatar} alt={userData.name} />
                                             <AvatarFallback>{userData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                                         </Avatar>
                                     </div>
@@ -277,16 +304,14 @@ export default function UserProfilePage() {
 
                 <TabsContent value="orders">
                     <Card>
-                        <CardHeader >
+                        <CardHeader>
                             <div className="flex justify-between">
                                 <div className="">
                                     <CardTitle>Order History</CardTitle>
                                     <CardDescription>View your past orders</CardDescription>
                                 </div>
-                                <Button color="primary" onPress={() => navigate('/track')}>Track Orders</Button>
+                                <Button color="primary" onClick={() => navigate('/track')}>Track Orders</Button>
                             </div>
-
-
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
@@ -299,7 +324,7 @@ export default function UserProfilePage() {
                                         <CardContent>
                                             <div className="flex justify-between items-center">
                                                 <p className="font-semibold">Total: ₹{order.total.toFixed(2)}</p>
-                                                <Badge>{order.orderStatus}</Badge>
+                                                <Badge>{order.status}</Badge>
                                             </div>
                                         </CardContent>
                                         <CardFooter>
@@ -331,7 +356,7 @@ export default function UserProfilePage() {
                                                             <h4 className="font-semibold">Total: ₹{order.total.toFixed(2)}</h4>
                                                         </div>
                                                         <div>
-                                                            <h4 className="font-semibold">Status: {order.orderStatus}</h4>
+                                                            <h4 className="font-semibold">Status: {order.status}</h4>
                                                         </div>
                                                         <div>
                                                             <h4 className="font-semibold">Placed On: {new Date(order.placedOn).toLocaleString()}</h4>

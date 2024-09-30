@@ -72,6 +72,7 @@ export default function DeliveryProfile() {
     }
 
     function handleLogout() {
+        localStorage.removeItem('user')
         localStorage.removeItem('token')
         localStorage.removeItem('refreshToken')
         toast({
