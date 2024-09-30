@@ -340,16 +340,18 @@ export default function CheckoutPage() {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Payment</CardTitle>
-                                <CardDescription>Complete your order with Razorpay.</CardDescription>
+                                <CardDescription>Complete your order with PhonePe.</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <p>Click the button below to open the Razorpay payment gateway.</p>
+                                <p>Click the button below to open the PhonePe payment gateway. </p>
                             </CardContent>
                             <CardFooter>
-                                <Button type="button" variant="outline" className="mr-2" onClick={() => setStep(2)}>
+                                <Button type="button" variant="flat" className="mr-2" onClick={() => setStep(2)}>
                                     Back
                                 </Button>
-                                <Button type="submit" color="primary" variant="solid" isLoading={Paymenting}>Pay Now</Button>
+                                <Button type="submit" color="primary" variant="solid" isLoading={Paymenting} >Pay Now
+                                    ₹{order.total.toFixed(2)}
+                                </Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>
