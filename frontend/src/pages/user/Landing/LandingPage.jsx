@@ -5,6 +5,7 @@ import CategorySection from './CategorySection'
 import OffersSection from './OffersSection'
 
 function LandingPage() {
+
     return (
         <div className=" bg-amber-50 font-Montserrat">
             <div className="px-24 ">
