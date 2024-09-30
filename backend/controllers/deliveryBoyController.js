@@ -1,6 +1,7 @@
 // controllers/deliveryBoyController.js
 const DeliveryBoy = require('../models/DeliveryBoy');
 const Order = require('../models/Order');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -27,6 +28,8 @@ exports.getPackedOrders = async (req, res) => {
     }
 };
 
+
+
 exports.acceptOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.orderId);
@@ -42,6 +45,16 @@ exports.acceptOrder = async (req, res) => {
 
         req.deliveryBoy.acceptedOrders.push(order._id);
         await req.deliveryBoy.save();
+
+        // Update user's order history
+        const user = await User.findOne({ 'orderHistory.orderId': order.orderId });
+        if (user) {
+            const orderIndex = user.orderHistory.findIndex(o => o.orderId === order.orderId);
+            if (orderIndex !== -1) {
+                user.orderHistory[orderIndex].status = 'out for delivery';
+                await user.save();
+            }
+        }
 
         res.json(order);
     } catch (error) {
@@ -72,6 +85,16 @@ exports.updateOrderStatus = async (req, res) => {
 
         order.status = 'delivered';
         await order.save();
+
+        // Update user's order history
+        const user = await User.findOne({ 'orderHistory.orderId': order.orderId });
+        if (user) {
+            const orderIndex = user.orderHistory.findIndex(o => o.orderId === order.orderId);
+            if (orderIndex !== -1) {
+                user.orderHistory[orderIndex].status = 'delivered';
+                await user.save();
+            }
+        }
 
         res.json(order);
     } catch (error) {

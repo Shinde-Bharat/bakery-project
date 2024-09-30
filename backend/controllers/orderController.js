@@ -16,7 +16,7 @@ exports.createOrder = async (req, res) => {
             orderId: order.orderId,
             placedOn: order.date,
             total: order.total,
-            orderStatus: order.status,
+            status: order.status,
             items: order.items
         });
         await user.save();
@@ -69,7 +69,7 @@ exports.updateOrderStatus = async (req, res) => {
         if (user) {
             const orderIndex = user.orderHistory.findIndex(o => o.orderId === order.orderId);
             if (orderIndex !== -1) {
-                user.orderHistory[orderIndex].orderStatus = status;
+                user.orderHistory[orderIndex].status = status;
                 await user.save();
             }
         }

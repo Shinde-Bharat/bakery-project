@@ -21,7 +21,7 @@ const orderHistorySchema = new mongoose.Schema({
     orderId: String,
     placedOn: Date,
     total: Number,
-    orderStatus: String,
+    status: String,
     items: [orderItemSchema]
 });
 
