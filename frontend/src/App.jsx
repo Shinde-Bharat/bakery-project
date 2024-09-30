@@ -30,6 +30,7 @@ import LandingPage from './pages/user/Landing/LandingPage';
 import NotFound from './pages/common/NotFound';
 import ContactPage from './pages/user/Landing/ContactPage';
 import PaymentStatus from './pages/user/CheckoutPage/PaymentStatus';
+import AboutUs from './pages/user/AboutUs/AboutUs';
 
 // color-amber
 
@@ -52,6 +53,7 @@ const App = () => {
             <Route path="/confirmedOrdered/:orderId" element={<OrderConfirmedPage />} />
             <Route path="/track" element={<TrackOrderPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/about" element={<AboutUs />} />
             <Route path="/payment-status" element={<PaymentStatus />} />
           </Route>
 
