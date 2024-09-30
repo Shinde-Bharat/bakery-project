@@ -52,10 +52,10 @@ const MERCHANT_ID = "PGTESTPAYUAT86"
 const MERCHANT_BASE_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay"
 const MERCHANT_STATUS_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status"
 
-const redirectUrl = "http://localhost:3000/payment-status"
+const redirectUrl = `${process.env.BACKEND_URL}/payment-status`
 
-const successUrl = "http://localhost:5173/confirmedOrdered"
-const failureUrl = "http://localhost:5173/payment-failure"
+const successUrl = `${process.env.CLIENT_URL}/confirmedOrdered`
+const failureUrl = `${process.env.CLIENT_URL}/payment-failure`
 
 app.post('/create-order', auth, async (req, res) => {
     const { orderId, name, mobileNumber, amount, customer, shippingAddress, postalCode, date, items, total } = req.body;
