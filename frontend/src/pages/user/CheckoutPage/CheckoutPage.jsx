@@ -350,7 +350,7 @@ export default function CheckoutPage() {
                                     Back
                                 </Button>
                                 <Button type="submit" color="primary" variant="solid" isLoading={Paymenting} >Pay Now
-                                    ₹{order.total.toFixed(2)}
+
                                 </Button>
                             </CardFooter>
                         </Card>
