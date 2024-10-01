@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Instagram, Facebook } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { Image } from '@nextui-org/react';
+import logo from '../../../assets/logo/logo.png';
 
 const Footer = () => {
     return (
@@ -10,8 +12,12 @@ const Footer = () => {
                 <div className="flex flex-wrap justify-between">
                     {/* Logo and Description */}
                     <div className="w-full md:w-1/4 mb-6 md:mb-0">
-                        <h2 className="text-xl font-bold mb-2">Your Bakery Name</h2>
-                        <p className="text-sm">
+                        <NavLink to={'/'} className={'flex items-center gap-x-2'}>
+
+                            <Image src={logo} alt="Amruta Bakery" width={80} />
+                            <span className='font-bold text-xl text-white'>Amruta Bakers</span>
+                        </NavLink>
+                        <p className="text-sm mt-2">
                             Nestled in the heart of the community, our bakery offers
                             a warm and inviting atmosphere where the aroma of
                             freshly baked bread and sweet treats fills the air.

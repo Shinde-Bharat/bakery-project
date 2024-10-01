@@ -1,9 +1,10 @@
 import { useCart, useUser, useWishlist } from "@/hooks/reduxHooks";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Input, Badge } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Button, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Input, Badge, Image } from "@nextui-org/react";
 import { Heart, SearchIcon, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import logo from '../../assets/logo/logo.png'
 
 
 export default function NavBar() {
@@ -32,7 +33,11 @@ export default function NavBar() {
                     className="sm:hidden"
                 />
                 <NavbarBrand>
-                    <p className="font-bold text-inherit">Bakery </p>
+                    {/* <p className="font-bold text-inherit">Bakery </p> */}
+                    <NavLink to={'/'}>
+
+                        <Image src={logo} alt="Amruta Bakery" width={70} />
+                    </NavLink>
                 </NavbarBrand>
             </NavbarContent>
 
